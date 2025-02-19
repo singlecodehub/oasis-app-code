@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture and Edit Image</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+            cursor: crosshair;
+        }
+        .tools {
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Capture, Edit, and Download Image</h2>
+    <input type="file" id="camera_input" accept="image/*" capture="environment" />
+    <canvas id="canvas" width="400" height="300"></canvas>
+    <div class="tools">
+        <button class="btn" onclick="enableHighlight()">Highlighter</button>
+        <button class="btn" onclick="clearCanvas()">Clear</button>
+        <button class="btn" onclick="downloadImage()">Download</button>
+    </div>
+    <script>
+        const cameraInput = document.getElementById("camera_input");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        let drawing = false;
+        let isHighlighting = false;
+
+        // Load the selected image onto the canvas
+        cameraInput.addEventListener("change", function () {
+            if (cameraInput.files && cameraInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(cameraInput.files[0]);
+            }
+        });
+
+        // Enable highlighter tool
+        function enableHighlight() {
+            isHighlighting = true;
+        }
+
+        // Draw on the canvas
+        canvas.addEventListener("mousedown", (e) => {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+            if (drawing) {
+                ctx.strokeStyle = isHighlighting ? "rgba(255, 255, 0, 0.5)" : "#000";
+                ctx.lineWidth = isHighlighting ? 10 : 2;
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            }
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            drawing = false;
+        });
+
+        // Clear the canvas
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Download the edited image
+        function downloadImage() {
+            const link = document.createElement("a");
+            link.download = "edited-image.png";
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>

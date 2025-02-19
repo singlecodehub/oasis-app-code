@@ -1,0 +1,1264 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<style>
+    /* Body Styling */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fc;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        padding-bottom: 60px; /* Ensure content doesn't get hidden behind fixed buttons */
+    }
+
+    h1 {
+        text-align: center;
+        color: #4CAF50;
+        margin-top: 30px;
+    }
+
+    p.text-center {
+        text-align: center;
+        font-size: 18px;
+        color: #555;
+    }
+
+    /* Container for form and navigation */
+    .form-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Styling for the sections */
+    .form-section-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .form-section {
+        width: 100%;
+        max-width: 800px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: none; /* Initially hide all sections */
+    }
+
+    .form-section.active {
+        display: block; /* Show the active section */
+    }
+
+    .form-section h2 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Styling for inputs and buttons */
+    .form-section input[type="text"],
+    .form-section input[type="email"],
+    .form-section input[type="number"],
+    .form-section select,
+    .form-section textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    /* Fixing the buttons at the bottom of the screen */
+    .navigation-buttons {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: white; /* Optional: Background color for visibility */
+        padding: 10px 10px;
+        display: flex;
+        justify-content: space-between;
+        z-index: 1000; /* Ensures buttons appear above other content */
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Optional: Shadow effect */
+    }
+
+    .navigation-buttons button {
+        flex-grow: 1; /* Make buttons flexible */
+        margin: 0 5px; /* Add some margin for spacing */
+        min-width: 100px; /* Ensure a minimum button width */
+        padding: 6px
+    }
+
+    /* Responsive design for smaller screens */
+    @media (max-width: 600px) {
+        .navigation-buttons {
+            justify-content: space-between; /* Adjust alignment for smaller screens */
+        }
+
+        .navigation-buttons button {
+            flex-grow: 1; /* Allow buttons to stretch if needed */
+            max-width: 30%; /* Limit the button width on small screens */
+            margin: 5px;
+        }
+    }
+</style>
+
+
+
+<h1>OASIS Form</h1>
+<p class="text-center">Please enter the patient's information.</p>
+
+<div class="form-container">
+    <div class="form-section-wrapper">
+        <!-- Patient Info Section -->
+        <div class="form-section" id="pat_info_section">
+            <h2>Patient Information</h2>
+            <form method="post" action="{% url 'about' %}" onsubmit="return showSaveMessage()" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Add a hidden input for the ID -->
+                <input type="hidden" name="row_id" value="{{ request.GET.row_id|default:'' }}">
+                {% comment %} <div>
+                    <label for="id_pat_info">Patient Info:</label>
+                    <textarea name="pat_info" rows="5" style="width:100%">{{ request.GET.pat_info|default:'' }}</textarea>
+                </div> {% endcomment %}
+                <div>
+                    <label for="id_name">Name:</label>
+                    <input type="text" name="name" value="{{ request.GET.name|default:'' }}">
+                </div>
+                <div>
+                    <label for="id_mrn">MRN:</label>
+                    <input type="text" name="mrn" value="{{ request.GET.mrn|default:'' }}">
+                </div>
+                <div>
+                    <label for="id_pat_demo">Patient Demographics:</label>
+                    <textarea name="pat_demo" rows="5" style="width:100%">{{ request.GET.pat_demo|default:'' }}</textarea>
+                </div>
+                <div>
+                    <label for="id_cli_name">Clinician Name:</label>
+                    <input type="text" name="cli_name" value="{{ cli_name }}" readonly>
+                </div>
+                {% comment %} <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="margin-right: 20px;">
+                        <label for="id_visit_date">Visit Date:</label>
+                        <input type="date" name="visit_date" value="{{ request.GET.visit_date|default:'' }}">
+                    </div>
+                    <div style="margin-right: 20px;">
+                        <label for="id_time_in">Time In:</label>
+                        <input type="time" name="time_in" value="{{ request.GET.time_in|default:'' }}">
+                    </div>
+                    <div>
+                        <label for="id_time_out">Time Out:</label>
+                        <input type="time" name="time_out" value="{{ request.GET.time_out|default:'' }}">
+                    </div>
+                </div> {% endcomment %}
+                
+                <div style="margin-right: 20px display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <label for="id_visit_date">Visit Date:</label>
+                    <input type="date" name="visit_date" value="{{ request.GET.visit_date|default:'' }}">
+                </div>
+                <h4></h4>
+                <div style="margin-right: 20px display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <label for="id_time_in">Time In:</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="time" name="time_in" value="{{ request.GET.time_in|default:'' }}">
+                </div>
+                <h4></h4>
+                <div style="margin-right: 20px display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <label for="id_time_out">Time Out:</label>&nbsp;
+                    <input type="time" name="time_out" value="{{ request.GET.time_out|default:'' }}">
+                </div>
+                     
+        </div>
+
+        <!-- Clinical Records Section -->
+        <div class="form-section" id="cli_rec_section">
+            <h2>Clinical Records</h2>
+            <div>
+                <label for="id_cli_rec">Clinical Records:</label>
+                <textarea name="cli_rec" rows="5" style="width:100%">{{ request.GET.cli_rec|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>Homebound Status:</strong><br>
+                • Justify and mention AD type and level of assistance.</p>
+
+                <p><strong>Living Arrangements:</strong><br>
+                • <strong>Home Safety:</strong> Evaluate the safety of the living environment, including the need for adaptive equipment or modifications.<br>
+                • <strong>Support System:</strong> Document available family, friends, and community resources supporting the patient's care.<br>
+                • <strong>Hazards:</strong> May include stairs, cluttered/soiled areas, pets, narrow paths, fire equipment, poor handling, tubing (O2, Foley).</p>
+
+                <p><strong>Immunizations:</strong><br>
+                List received immunizations and dates:<br>
+                1. Pneumonia<br>
+                2. Flu<br>
+                3. Tetanus<br>
+                4. TB<br>
+                5. Hep B<br>
+                6. COVID</p>
+            </div>
+        </div>
+
+
+
+        <!-- BIMS Section -->
+        <div class="form-section" id="bims_section">
+            <h2>BIMS</h2>
+            <div>
+                <label for="id_bims">BIMS Summary Score C0500:</label>
+                <textarea name="bims" rows="5" style="width:100%">{{ request.GET.bims|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>Repetition of Three Words: Sock, Blue, Bed</strong><br>
+                Ask the patient to repeat the words. You can repeat the words up to two more times.</p>
+
+                <p><strong>Scoring:</strong><br>
+                • 0 points = no word | 1 = one word | 2 = two | 3 = three words</p>
+
+                <p><strong>Temporal Orientation: Year, Month, Day</strong></p>
+                
+                <p><strong>Year:</strong> What year is it right now?<br>
+                • 0 points: Off by 5+ years or no answer<br>
+                • 1 point: Off by 2-5 years<br>
+                • 2 points: Off by 1 year<br>
+                • 3 points: Correct year</p>
+
+                <p><strong>Month:</strong> What month are we in right now?<br>
+                • 0 points: Off by more than one month or no answer.<br>
+                • 1 point: Off by 6 days to 1 month.<br>
+                • 2 points: Accurate within 5 days.</p>
+
+                <p><strong>Day:</strong> What day of the week is today?<br>
+                • 0 points: Incorrect or no answer.<br>
+                • 1 point: Correct.</p>
+
+                <p><strong>Recall:</strong><br>
+                Ask the patient to recall the three words mentioned earlier (sock, blue, bed).</p>
+                
+                <p><strong>Scoring:</strong><br>
+                • 0 points: Cannot recall the word.<br>
+                • 1 point: Recalls after cueing.<br>
+                • 2 points: Recalls without cueing.</p>
+
+                <p><strong>BIMS Summary Score:</strong><br>
+                • Add the scores from the above sections (0-15).</p>
+            </div>
+        </div>
+
+
+        <!-- CAMS Section -->
+        <div class="form-section" id="cams_section">
+            <h2>CAMS</h2>
+            <div>
+                <label for="id_cams">CAMS:</label>
+                <textarea name="cams" rows="5" style="width:100%">{{ request.GET.cams|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>CAM©: Signs and Symptoms of Delirium</strong></p>
+
+                <p><strong>Acute Onset of Mental Status Change:</strong><br>
+                Is there evidence of an acute change in mental status from the patient's baseline?<br>
+                0: No   ||   1: Yes   ||  Not Assessed/No Information</p>
+
+                <p><strong>Inattention:</strong><br>
+                Did the patient have difficulty focusing attention, e.g., being easily distractible or having difficulty keeping track of what was being said?</p>
+
+                <p><strong>Scale:</strong><br>
+                0: Behavior not present<br>
+                1: Behavior continuously present, does not fluctuate<br>
+                2: Behavior present, fluctuates (comes and goes, changes in severity)<br>
+                3: Not Assessed/No Information</p>
+
+                <p><strong>Disorganized Thinking:</strong><br>
+                Was the patient's thinking disorganized or incoherent (rambling or irrelevant conversation, unclear or illogical flow of ideas, unpredictable switching)?<br>
+                Answer 0, 1, 2 or 3</p>
+
+                <p><strong>Altered Level of Consciousness:</strong><br>
+                Did the patient have an altered level of consciousness, as indicated by:<br>
+                • Vigilant: Startled easily<br>
+                • Lethargic: Repeatedly dozed off when asked questions, but responded to voice or touch<br>
+                • Stuporous: Very difficult to arouse and keep aroused for the interview<br>
+                • Comatose: Could not be aroused<br>
+                Answer 0, 1, 2 or 3</p>
+            </div>
+        </div>
+ 
+
+        <!-- PHQ Section -->
+        <div class="form-section" id="phq_section">
+            <h2>PHQ</h2>
+            <div>
+                <label for="id_phq">PHQ:</label>
+                <textarea name="phq" rows="5" style="width:100%">{{ request.GET.phq|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>Patient Health Questionnaire (PHQ-2 & PHQ-9)</strong></p>
+
+                <p><strong>1. During the past two weeks, have you often been bothered by little interest or pleasure in doing things?</strong><br>
+                (Yes/No)</p>
+
+                <p><strong>2. During the past two weeks, have you often been bothered by feeling down, depressed, or hopeless?</strong><br>
+                (Yes/No)</p>
+            </div>
+        </div>
+
+
+        <!-- Physical Assessment Section -->
+        <div class="form-section" id="phy_ass_section">
+            <h2>Physical Assessment</h2>
+            <div>
+                <label for="id_phy_ass">Physical Assessment:</label>
+                <textarea name="phy_ass" rows="5" style="width:100%">{{ request.GET.phy_ass|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>1. Vital Signs:</strong><br>
+                • Blood pressure, pulse, respiration, SPO2, temperature<br>
+                • Pain Level: (1-10 scale, site, duration, what makes it worse/better, medication use, effectiveness)</p>
+
+                <p><strong>2. Height and Weight</strong></p>
+
+                <p><strong>3. Neurological Assessment:</strong><br>
+                • Evaluate mental status, orientation, and ability to understand/follow directions – any comments in addition to BIMS, CAM, and PHQ</p>
+
+                <p><strong>4. Cardiopulmonary Status:</strong><br>
+                • Assess: Heart, lungs, respiratory rate, rhythm<br>
+                • DOE: Severity rating/Oxygen use/Leg edema</p>
+
+                <p><strong>5. Integumentary Assessment:</strong><br>
+                • Inspect skin for wounds, surgical sites, pressure ulcers<br>
+                • Complete Wound Care Worksheet for all open wounds</p>
+
+                <p><strong>6. Endocrine:</strong><br>
+                • DM: Yes/No. If Yes, include insulin (Yes/No), oral meds (Yes/No), RBS #</p>
+
+                <p><strong>7. Elimination Status:</strong><br>
+                • Recent UTI, incontinence (Bowel and/or Bladder)<br>
+                • Catheter: Yes/No (if Yes, provide care details)<br>
+                • Ostomy: Yes/No (if Yes, provide care details)<br>
+                • Any other symptoms noted</p>
+
+                <p><strong>8. Nutrition:</strong><br>
+                • Ordered Diet, Appetite</p>
+
+                <p><strong>9. Mobility and Strength:</strong><br>
+                • Evaluate the ability to move independently or with assistance<br>
+                • Assistive Devices: Mention with/without assistance<br>
+                • Activities permitted</p>
+            </div>
+        </div>
+
+
+        <!-- Range of Motion Section -->
+        <div class="form-section" id="rom_section">
+            <h2>Range of Motion</h2>
+            <div>
+                <label for="id_rom">Range of Motion:</label>
+                <textarea name="rom" rows="5" style="width:100%">{{ request.GET.rom|default:'' }}</textarea>
+            </div>
+            
+            <!-- Content under the Range of Motion label -->
+            <div>
+                <p><strong>1. ROM/Strength:</strong><br>
+                • Example–MMT BUE and BLE grossly 3+/5. L side weaker than R. ROM of extremities WFL</p>
+
+                <p><strong>2. Additional Comments:</strong><br>
+                • Example-paralysis, weakness, unsteady gait, antalgic gait, balance defect, limited ROM, fall risk</p>
+            </div>
+        </div>
+
+
+        <!-- Special Treatments, Procedures and Programs Section -->
+        <div class="form-section" id="spc_tre_section">
+            <h2>Special Treatments, Procedures and Programs</h2>
+            <div>
+                <label for="id_spc_tre">Special Treatments, Procedures and Programs:</label>
+                <textarea name="spc_tre" rows="5" style="width:100%">{{ request.GET.spc_tre|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>1. Respiratory Therapies</strong></p>
+
+                <p><strong>2. IV Medications/IV Access:</strong><br>
+                • PICC line: Yes/No</p>
+
+                <p><strong>3. Dialysis:</strong><br>
+                • Yes/No</p>
+            </div>
+        </div>
+
+        
+        <!-- Service Requested Section -->
+        <div class="form-section" id="ser_req_section">
+            <h2>Service Requested</h2>
+            <div>
+                <label for="id_ser_req">Service Requested:</label>
+                <textarea name="ser_req" rows="5" style="width:100%">{{ request.GET.ser_req|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>Service requested for the following disciplines along with the frequency:</strong><br>
+                SN (Skilled Nursing), PT (Physical Therapy), OT (Occupational Therapy), HHA (Home Health Aide), MSW (Medical Social Worker), ST (Speech Therapy)</p>
+            </div>
+        </div>
+
+
+        <!-- Clinical Summary Section -->
+        <div class="form-section" id="cli_sum_section">
+            <h2>Clinical Summary</h2>
+            <div>
+                <label for="id_cli_sum">Clinical Summary / Narrative:</label>
+                <textarea name="cli_sum" rows="5" style="width:100%">{{ request.GET.cli_sum|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>1. State the skilled need for home healthcare services:</strong></p>
+                <p><strong>2. Spoke with ________@ Dr. ______ office on _________</strong></p>
+                <p><strong>3. If there are any additional SOC findings not noted above in the systems review, add that here:</strong></p>
+            </div>
+        </div>
+
+
+        <!-- Medical Supplies Section -->
+        <div class="form-section" id="med_sup_section">
+            <h2>Medical Supplies</h2>
+            <div>
+                <label for="id_med_sup">Medical Supplies:</label>
+                <textarea name="med_sup" rows="5" style="width:100%">{{ request.GET.med_sup|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>List any supplies needed to carry out patient care:</strong></p>
+            </div>
+        </div>
+
+
+        <!-- Goal Section -->
+        <div class="form-section" id="goal_section">
+            <h2>Goal</h2>
+            <div>
+                <label for="id_goal">Goal and Interventions:</label>
+                <textarea name="goal" rows="5" style="width:100%">{{ request.GET.goal|default:'' }}</textarea>
+            </div>
+            <div>
+                <p><strong>What other Goals & Interventions besides the required high-risk medications, hospitalization risk, fall/home safety, emergency disaster planning, and review of systems are needed? See examples below:</strong></p>
+                <ul>
+                    <li>DM</li>
+                    <li>Skin: wound care--location specific with treatment plan (frequency and dressing should be matched with mentioned in WC sheet)</li>
+                    <li>Symptoms (Pain, issues with vital signs, etc.)--pain G/I</li>
+                    <li>Picc line G/I for CT (only to assess site for S/S of infection and arm circumference)</li>
+                    <li>Ostomy G/I</li>
+                    <li>Catheter use G/I</li>
+                    <li>Lab orders G/I</li>
+                    <li>Skin breakdown/pressure relieving G/I in WC/BEDBOUND</li>
+                    <li>Infections G/I</li>
+                    <li>Therapy G/I</li>
+                    <li>Any other G/I you want added to POC</li>
+                </ul>
+            </div>
+        </div>
+
+
+        
+            
+
+
+        <!-- Updated Wound Images and Information Section -->
+        <div class="form-section" id="pat_info_section">
+            <h2>Wound Images and Information</h2>
+            <form method="post" action="{% url 'about' %}" onsubmit="return showSaveMessage()" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="row_id" value="{{ request.GET.row_id|default:'' }}">
+
+                <div id="camera_section">
+                    <label for="camera_input" class="camera-icon">
+                        <i class="fas fa-camera" style="font-size: 50px;"></i> Click to take a photo
+                    </label>
+                    <input type="file" id="camera_input" name="images[]" accept="image/*" capture="camera" multiple onchange="previewImages(event)">
+                    <div id="image_preview"></div>
+                </div>
+
+                <div>
+                    <label for="img_des">Image Description:</label>
+                    <textarea name="img_des" rows="3" style="width:100%"></textarea>
+                </div>
+        </div>
+
+        <!-- Misc Image Upload -->
+        {% comment %} <div class="form-section" id="misc_image_section">
+            <form method="post" action="{% url 'about' %}" onsubmit="return showSaveMessage()" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="row_id" value="{{ request.GET.row_id|default:'' }}">
+
+                <h4>Consent Form Image</h4>
+                <div id="camera_section">
+                    <label for="camera_input" class="camera-icon">
+                        <i class="fas fa-camera" style="font-size: 50px;"></i> Click to take a photo
+                    </label>
+                    <input type="file" id="camera_input_cf" name="images[]" accept="image/*" capture="camera">
+                    <div id="image_preview"></div>
+                </div>
+
+                <h1></h1>
+                <h4>Emergency Care Plan Image</h4>
+                <div id="camera_section">
+                    <label for="camera_input" class="camera-icon">
+                        <i class="fas fa-camera" style="font-size: 50px;"></i> Click to take a photo
+                    </label>
+                    <input type="file" id="camera_input_ecp" name="images[]" accept="image/*" capture="camera">
+                    <div id="image_preview"></div>
+                </div>
+
+                <h1></h1>
+                <h4>Med List Image</h4>
+                <div id="camera_section">
+                    <label for="camera_input" class="camera-icon">
+                        <i class="fas fa-camera" style="font-size: 50px;"></i> Click to take a photo
+                    </label>
+                    <input type="file" id="camera_input_ml" name="images[]" accept="image/*" capture="camera">
+                    <div id="image_preview"></div>
+                </div>
+
+        </div> {% endcomment %}
+
+        
+
+
+        <!-- Functional Status Section -->
+        <div class="form-section" id="fun_status_section">
+            <h2>Functional Status</h2>
+            <form method="post" action="{% url 'about' %}" onsubmit="return showSaveMessage()">
+                {% csrf_token %}
+                <!-- Add a hidden input for the ID -->
+                <input type="hidden" name="row_id" value="{{ request.GET.row_id|default:'' }}">
+                
+                <!-- Dropdown for GG0130A (Eating) -->
+                <div>
+                    <label for="id_GG0130A">GG0130A (Eating):</label>
+                    <select name="GG0130A" id="id_GG0130A">
+                        <option value="" {% if request.GET.GG0130A == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0130A == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0130A == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0130A == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0130A == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0130A == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0130A == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0130A == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0130A == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0130A == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0130A == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0130A == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+                
+                <!-- Dropdown for GG0130B (Oral Hygiene) -->
+                <div>
+                    <label for="id_GG0130B">GG0130B (Oral Hygiene):</label>
+                    <select name="GG0130B" id="id_GG0130B">
+                        <option value="" {% if request.GET.GG0130B == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0130B == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0130B == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0130B == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0130B == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0130B == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0130B == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0130B == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0130B == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0130B == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0130B == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0130B == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0130C (Bathing) -->
+                <div>
+                    <label for="id_GG0130C">GG0130C (Toilet Hygiene):</label>
+                    <select name="GG0130C" id="id_GG0130C">
+                        <option value="" {% if request.GET.GG0130C == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0130C == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0130C == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0130C == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0130C == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0130C == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0130C == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0130C == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0130C == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0130C == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0130C == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0130C == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0130E (Shower / Bath Self) -->
+                <div>
+                    <label for="id_GG0130E">GG0130E (Shower / Bath Self):</label>
+                    <select name="GG0130E" id="id_GG0130E">
+                        <option value="" {% if request.GET.GG0130E == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0130E == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0130E == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0130E == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0130E == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0130E == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0130E == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0130E == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0130E == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0130E == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0130E == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0130E == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0130F (Upper Body Dressing) -->
+                <div>
+                    <label for="id_GG0130F">GG0130F (Upper Body Dressing):</label>
+                    <select name="GG0130F" id="id_GG0130F">
+                        <option value="" {% if request.GET.GG0130F == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0130F == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0130F == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0130F == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0130F == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0130F == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0130F == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0130F == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0130F == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0130F == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0130F == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0130F == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0130G (Lower Body Dressing)-->
+                <div>
+                    <label for="id_GG0130G">GG0130G (Lower Body Dressing):</label>
+                    <select name="GG0130G" id="id_GG0130G">
+                        <option value="" {% if request.GET.GG0130G == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0130G == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0130G == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0130G == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0130G == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0130G == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0130G == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0130G == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0130G == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0130G == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0130G == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0130G == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0130H (Putting on / taking off footwear) -->
+                <div>
+                    <label for="id_GG0130H">GG0130H (Putting on / taking off footwear):</label>
+                    <select name="GG0130H" id="id_GG0130H">
+                        <option value="" {% if request.GET.GG0130H == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0130H == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0130H == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0130H == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0130H == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0130H == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0130H == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0130H == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0130H == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0130H == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0130H == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0130H == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0170 A & B (Bed mobility left to right or right to left) -->
+                <div>
+                    <label for="id_GG0170AB">GG0170 A & B (Bed mobility left to right or right to left):</label>
+                    <select name="GG0170AB" id="id_GG0170AB">
+                        <option value="" {% if request.GET.GG0170AB == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0170AB == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0170AB == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0170AB == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0170AB == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0170AB == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0170AB == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0170AB == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0170AB == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0170AB == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0170AB == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0170AB == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0170C (Lying to Sitting on the side of the bed) -->
+                <div>
+                    <label for="id_GG0170C">GG0170C (Lying to Sitting on the side of the bed):</label>
+                    <select name="GG0170C" id="id_GG0170C">
+                        <option value="" {% if request.GET.GG0170C == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0170C == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0170C == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0170C == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0170C == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0170C == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0170C == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0170C == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0170C == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0170C == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0170C == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0170C == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0170D (Sit to Stand) -->
+                <div>
+                    <label for="id_GG0170D">GG0170D (Sit to Stand):</label>
+                    <select name="GG0170D" id="id_GG0170D">
+                        <option value="" {% if request.GET.GG0170D == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0170D == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0170D == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0170D == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0170D == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0170D == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0170D == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0170D == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0170D == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0170D == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0170D == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0170D == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0170E (Chair / Bed to Chair Transfer) -->
+                <div>
+                    <label for="id_GG0170E">GG0170E (Chair / Bed to Chair Transfer):</label>
+                    <select name="GG0170E" id="id_GG0170E">
+                        <option value="" {% if request.GET.GG0170E == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG0170E == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG0170E == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG0170E == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG0170E == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG0170E == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG0170E == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG0170E == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG0170E == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG0170E == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG0170E == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG0170E == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170F (Toilet Transfer) -->
+                <div>
+                    <label for="id_GG170F">GG170F (Toilet Transfer):</label>
+                    <select name="GG170F" id="id_GG170F">
+                        <option value="" {% if request.GET.GG170F == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170F == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170F == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170F == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170F == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170F == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170F == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170F == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170F == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170F == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170F == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170F == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170I (Walk 10 feet) -->
+                <div>
+                    <label for="id_GG170I">GG170I (Walk 10 feet):</label>
+                    <select name="GG170I" id="id_GG170I">
+                        <option value="" {% if request.GET.GG170I == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170I == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170I == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170I == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170I == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170I == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170I == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170I == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170I == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170I == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170I == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170I == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170J (Walk 50 feet with 2 turns) -->
+                <div>
+                    <label for="id_GG170J">GG170J (Walk 50 feet with 2 turns):</label>
+                    <select name="GG170J" id="id_GG170J">
+                        <option value="" {% if request.GET.GG170J == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170J == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170J == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170J == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170J == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170J == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170J == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170J == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170J == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170J == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170J == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170J == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170K (Walk 150 feet) -->
+                <div>
+                    <label for="id_GG170K">GG170K (Walk 150 feet):</label>
+                    <select name="GG170K" id="id_GG170K">
+                        <option value="" {% if request.GET.GG170K == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170K == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170K == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170K == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170K == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170K == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170K == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170K == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170K == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170K == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170K == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170K == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG0170L (Walking 10 feet on uneven surfaces) -->
+                <div>
+                    <label for="id_GG170L">GG170L (Walking 10 feet on uneven surfaces):</label>
+                    <select name="GG170L" id="id_GG170L">
+                        <option value="" {% if request.GET.GG170L == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170L == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170L == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170L == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170L == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170L == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170L == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170L == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170L == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170L == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170L == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170L == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170M (1 step) -->
+                <div>
+                    <label for="id_GG170M">GG170M (1 step):</label>
+                    <select name="GG170M" id="id_GG170M">
+                        <option value="" {% if request.GET.GG170M == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170M == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170M == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170M == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170M == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170M == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170M == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170M == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170M == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170M == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170M == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170M == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170N (4 Steps) -->
+                <div>
+                    <label for="id_GG170N">GG170N (4 Steps):</label>
+                    <select name="GG170N" id="id_GG170N">
+                        <option value="" {% if request.GET.GG170N == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170N == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170N == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170N == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170N == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170N == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170N == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170N == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170N == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170N == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170N == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170N == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170O (12 Steps) -->
+                <div>
+                    <label for="id_GG170O">GG170O (12 Steps):</label>
+                    <select name="GG170O" id="id_GG170O">
+                        <option value="" {% if request.GET.GG170O == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170O == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170O == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170O == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170O == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170O == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170O == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170O == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170O == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170O == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170O == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170O == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170P (Picking up object) -->
+                <div>
+                    <label for="id_GG170P">GG170P (Picking up object):</label>
+                    <select name="GG170P" id="id_GG170P">
+                        <option value="" {% if request.GET.GG170P == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170P == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170P == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170P == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170P == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170P == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170P == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170P == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170P == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170P == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170P == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170P == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170Q (Wheel 50 feet with two turns) -->
+                <div>
+                    <label for="id_GG170Q">GG170Q (Wheel 50 feet with two turns):</label>
+                    <select name="GG170Q" id="id_GG170Q">
+                        <option value="" {% if request.GET.GG170Q == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170Q == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170Q == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170Q == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170Q == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170Q == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170Q == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170Q == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170Q == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170Q == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170Q == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170Q == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for GG170R (Wheel 150 feet) -->
+                <div>
+                    <label for="id_GG170R">GG170R (Wheel 150 feet):</label>
+                    <select name="GG170R" id="id_GG170R">
+                        <option value="" {% if request.GET.GG170R == "" %}selected{% endif %}></option>
+                        <option value="Dependent" {% if request.GET.GG170R == "Dependent" %}selected{% endif %}>Dependent</option>
+                        <option value="Maximum Assist" {% if request.GET.GG170R == "Maximum Assist" %}selected{% endif %}>Maximum Assist</option>
+                        <option value="Moderate Assist" {% if request.GET.GG170R == "Moderate Assist" %}selected{% endif %}>Moderate Assist</option>
+                        <option value="Minimum Assist" {% if request.GET.GG170R == "Minimum Assist" %}selected{% endif %}>Minimum Assist</option>
+                        <option value="CGA (contact guard assistance)" {% if request.GET.GG170R == "CGA (contact guard assistance)" %}selected{% endif %}>CGA (contact guard assistance)</option>
+                        <option value="SBA (stand by assistance)" {% if request.GET.GG170R == "SBA (stand by assistance)" %}selected{% endif %}>SBA (stand by assistance)</option>
+                        <option value="Supervision" {% if request.GET.GG170R == "Supervision" %}selected{% endif %}>Supervision</option>
+                        <option value="Independent with Equipment" {% if request.GET.GG170R == "Independent with Equipment" %}selected{% endif %}>Independent with Equipment</option>
+                        <option value="Independent" {% if request.GET.GG170R == "Independent" %}selected{% endif %}>Independent</option>
+                        <option value="Not Attempted / tested due to medical condition" {% if request.GET.GG170R == "Not Attempted / tested due to medical condition" %}selected{% endif %}>Not Attempted / tested due to medical condition</option>
+                        <option value="Not applicable - no improvement expected" {% if request.GET.GG170R == "Not applicable - no improvement expected" %}selected{% endif %}>Not applicable - no improvement expected</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown for Assisted Device -->
+                <div>
+                    <label for="id_assisted_device">Assisted Device:</label>
+                    <select name="assisted_device" id="id_assisted_device">
+                        <option value="" {% if request.GET.assisted_device == "" %}selected{% endif %}></option>
+                        <option value="Wheel Chair" {% if request.GET.assisted_device == "Wheel Chair" %}selected{% endif %}>Wheel Chair</option>
+                        <option value="Walker (RW)" {% if request.GET.assisted_device == "Walker (RW)" %}selected{% endif %}>Walker (RW)</option>
+                        <option value="Walker (FWW)" {% if request.GET.assisted_device == "Walker (FWW)" %}selected{% endif %}>Walker (FWW)</option>
+                        <option value="Cane (SPC)" {% if request.GET.assisted_device == "Cane (SPC)" %}selected{% endif %}>Cane (SPC)</option>
+                        <option value="Cane (QUAD)" {% if request.GET.assisted_device == "Cane (QUAD)" %}selected{% endif %}>Cane (QUAD)</option>
+                        <option value="None" {% if request.GET.assisted_device == "None" %}selected{% endif %}>None</option>
+                    </select>
+                </div>
+           
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+        <button type="button" onclick="previousSection()">Previous</button>
+        <button type="submit" class="btn btn-success">Save</button>
+        <button type="button" onclick="nextSection()">Next</button>
+    </div>
+    </form>
+</div>
+
+
+<!-- Green Message Box Modal -->
+<div id="saveMessageModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 9999;">
+    <div style="background-color: #d4edda; color: #155724; padding: 20px; border-radius: 10px; width: 300px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <h2>Your information has been saved!</h2>
+        <button onclick="closeModal()" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>
+    </div>
+</div>
+
+
+{% comment %} <script>
+    function showSaveMessage() {
+        // Get the values of the name and mrn fields
+        const name = document.querySelector('input[name="name"]').value;
+        const mrn = document.querySelector('input[name="mrn"]').value;
+
+        const visit_date = document.querySelector('input[name="visit_date"]').value;
+        const time_in = document.querySelector('input[name="time_in"]').value;
+        const time_out = document.querySelector('input[name="time_out"]').value;
+    
+        // Check if the name and mrn fields are filled
+        if (name.trim() === "" || mrn.trim() === "" || visit_date.trim() === "" || time_in.trim() === "" || time_out.trim() === "") {
+            // If either field is empty, show an alert or a message
+            alert("Please fill in at least the Name, MRN, Visit Date, Time In and Time Out fields.");
+            return false; // Prevent form submission
+        }
+    
+        // Display the modal with the success message
+        const modal = document.getElementById('saveMessageModal');
+        if (modal) {
+            modal.style.display = 'flex'; // Show the modal
+        }
+    
+        // Prevent form submission for demonstration purposes (you can remove this when ready to submit)
+        return false;
+    }
+
+    function closeModal() {
+        // Hide the modal
+        const modal = document.getElementById('saveMessageModal');
+        if (modal) {
+            modal.style.display = 'none'; // Close the modal
+        }
+
+        // You can change this to allow form submission after closing the modal
+        // For now, it's preventing it to demonstrate the popup
+        const form = document.querySelector('form');
+        form.submit();
+    }
+
+    let currentSectionIndex = 0;
+    const sections = document.querySelectorAll('.form-section');
+    const prevButton = document.querySelector('.navigation-buttons button:nth-child(1)');
+    const nextButton = document.querySelector('.navigation-buttons button:nth-child(3)');
+
+    // Initially show the first section
+    sections[currentSectionIndex].classList.add('active');
+
+    // Hide/show the navigation buttons based on the current section index
+    function updateNavigationButtons() {
+        if (currentSectionIndex === 0) {
+            prevButton.style.display = 'none';  // Hide Previous button on the first page
+        } else {
+            prevButton.style.display = 'block';  // Show Previous button on other pages
+        }
+
+        if (currentSectionIndex === sections.length - 1) {
+            nextButton.style.display = 'none';  // Hide Next button on the last page
+        } else {
+            nextButton.style.display = 'block';  // Show Next button on other pages
+        }
+    }
+
+    // Function to show the next section
+    function nextSection() {
+        if (currentSectionIndex < sections.length - 1) {
+            sections[currentSectionIndex].classList.remove('active');
+            currentSectionIndex++;
+            sections[currentSectionIndex].classList.add('active');
+            updateNavigationButtons();  // Update button visibility
+        }
+    }
+
+    // Function to show the previous section
+    function previousSection() {
+        if (currentSectionIndex > 0) {
+            sections[currentSectionIndex].classList.remove('active');
+            currentSectionIndex--;
+            sections[currentSectionIndex].classList.add('active');
+            updateNavigationButtons();  // Update button visibility
+        }
+    }
+
+    // Initialize the button visibility on page load
+    updateNavigationButtons();
+
+</script> {% endcomment %}
+
+
+<script>
+    function showSaveMessage() {
+        // Get the values of the name and mrn fields
+        const name = document.querySelector('input[name="name"]').value;
+        const mrn = document.querySelector('input[name="mrn"]').value;
+
+        const visit_date = document.querySelector('input[name="visit_date"]').value;
+        const time_in = document.querySelector('input[name="time_in"]').value;
+        const time_out = document.querySelector('input[name="time_out"]').value;
+    
+        // Check if the name and mrn fields are filled
+        if (name.trim() === "" || mrn.trim() === "" || visit_date.trim() === "" || time_in.trim() === "" || time_out.trim() === "") {
+            // If either field is empty, show an alert or a message
+            alert("Please fill in at least the Name, MRN, Visit Date, Time In and Time Out fields.");
+            return false; // Prevent form submission
+        }
+    
+        // Display the modal with the success message
+        const modal = document.getElementById('saveMessageModal');
+        if (modal) {
+            modal.style.display = 'flex'; // Show the modal
+        }
+    
+        // Prevent form submission for demonstration purposes (you can remove this when ready to submit)
+        return false;
+    }
+
+    function closeModal() {
+        // Hide the modal
+        const modal = document.getElementById('saveMessageModal');
+        if (modal) {
+            modal.style.display = 'none'; // Close the modal
+        }
+
+        // You can change this to allow form submission after closing the modal
+        // For now, it's preventing it to demonstrate the popup
+        const form = document.querySelector('form');
+        form.submit();
+    }
+
+    let currentSectionIndex = 0;
+    const sections = document.querySelectorAll('.form-section');
+    const prevButton = document.querySelector('.navigation-buttons button:nth-child(1)');
+    const nextButton = document.querySelector('.navigation-buttons button:nth-child(3)');
+    const totalSections = sections.length;
+
+    // Initially show the first section
+    sections[currentSectionIndex].classList.add('active');
+
+    // Hide/show the navigation buttons based on the current section index
+    function updateNavigationButtons() {
+        if (currentSectionIndex === 0) {
+            prevButton.style.display = 'none';  // Hide Previous button on the first page
+        } else {
+            prevButton.style.display = 'block';  // Show Previous button on other pages
+        }
+
+        if (currentSectionIndex < totalSections - 1) {
+            nextButton.style.display = 'inline-block';
+            nextButton.textContent = `Next ${currentSectionIndex + 1}/${totalSections}`;
+        } else {
+            nextButton.style.display = 'none'; // Hide Next button on the last page
+        }
+    }
+
+    // Function to show the next section
+    function nextSection() {
+        if (currentSectionIndex < totalSections - 1) {
+            sections[currentSectionIndex].classList.remove('active');
+            currentSectionIndex++;
+            sections[currentSectionIndex].classList.add('active');
+            updateNavigationButtons();
+        }
+    }
+
+    // Function to show the previous section
+    function previousSection() {
+        if (currentSectionIndex > 0) {
+            sections[currentSectionIndex].classList.remove('active');
+            currentSectionIndex--;
+            sections[currentSectionIndex].classList.add('active');
+            updateNavigationButtons();  // Update button visibility
+        }
+    }
+
+    // Initialize the button visibility on page load
+    updateNavigationButtons();
+
+</script>
+
+
+<script>
+    const uploadedFiles = []; // Array to hold all uploaded files
+
+    // When previewing images and adding descriptions dynamically, append the description to the form
+function previewImages(event) {
+    const imagePreviewDiv = document.getElementById('image_preview');
+    const files = event.target.files;
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        // Check if the file is already uploaded to avoid duplicates
+        if (!uploadedFiles.some(f => f.name === file.name && f.size === file.size)) {
+            uploadedFiles.push(file); // Add the file to the array
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // Create a container for each image and close button
+                    const imgContainer = document.createElement('div');
+                    imgContainer.style.position = 'relative';
+                    imgContainer.style.display = 'inline-block';
+                    imgContainer.style.margin = '10px';
+
+                    // Create an image element
+                    const imgElement = document.createElement('img');
+                    imgElement.src = e.target.result;
+                    imgElement.style.maxWidth = '150px'; // Set a max width for image preview
+                    imgElement.style.border = '2px solid #ccc'; // Add a border around the image
+                    imgElement.style.borderRadius = '8px'; // Rounded corners for images
+
+                    // Create a close button (cross)
+                    const closeButton = document.createElement('span');
+                    closeButton.innerHTML = '&times;';
+                    closeButton.style.position = 'absolute';
+                    closeButton.style.top = '5px';
+                    closeButton.style.right = '5px';
+                    closeButton.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                    closeButton.style.borderRadius = '50%';
+                    closeButton.style.padding = '5px';
+                    closeButton.style.cursor = 'pointer';
+                    closeButton.style.fontSize = '20px';
+
+                    // Add event listener to remove image on click
+                    closeButton.onclick = function () {
+                        const index = uploadedFiles.findIndex(f => f.name === file.name && f.size === file.size);
+                        if (index !== -1) {
+                            uploadedFiles.splice(index, 1); // Remove from the array
+                        }
+                        imgContainer.remove(); // Remove the preview
+                        document.getElementById('description_' + file.name).remove(); // Remove description field
+                    };
+
+
+                    // Append the image and close button to the container
+                    imgContainer.appendChild(imgElement);
+                    imgContainer.appendChild(closeButton);
+                    imagePreviewDiv.appendChild(imgContainer);
+
+                    // Append the description field to the form
+                    const form = document.querySelector('form');
+                    form.appendChild(descriptionLabel);  // Append label to form
+                    form.appendChild(descriptionInput); // Append description to form
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
+    // Update the input field's files property with the current array of uploaded files
+    const dataTransfer = new DataTransfer();
+    uploadedFiles.forEach(file => dataTransfer.items.add(file));
+    document.getElementById('camera_input').files = dataTransfer.files;
+}
+
+</script>
+
+{% endblock %}

@@ -39,8 +39,6 @@ ALLOWED_HOSTS = [
     '192.168.68.74',
     'app.hoolime.care',  # Add your custom domain
     'hoolimegpt-780006979537.us-east4.run.app'  # Include your Cloud Run domain
-] + [
-    '3d73-119-82-92-120.ngrok-free.app'
 ]
 
 
@@ -65,8 +63,6 @@ INSTALLED_APPS += EXTERNAL_APPS
 CSRF_TRUSTED_ORIGINS = [
     'https://hoolimegpt-780006979537.us-east4.run.app',
     'https://app.hoolime.care',
-] + [
-    'https://3d73-119-82-92-120.ngrok-free.app'
 ]
 
 WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')

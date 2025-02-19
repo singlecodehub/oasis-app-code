@@ -264,8 +264,71 @@
                                 </div>
                             {% endfor %}
                         {% else %}
-                            <h2>No images upload.</h2>
+                            <h2>No image uploaded.</h2>
                         {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <div>
+                        <h2>Wound Images and Information</h2>
+                        <p id="maxImagesMsg" style="display: none; color: red; font-weight: bold; text-align: center; margin-top: 10px;">
+                            More images cannot be added for this patient.
+                        </p>
+                    
+                        <form method="post" action="{% url 'about' %}" onsubmit="return showSaveMessage()" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="row_id" value="{{ request.GET.row_id|default:'' }}">
+                    
+                            <script>
+                                let imageCount = 1;
+                                function captureImage(inputId) {
+                                    document.getElementById(inputId).click();
+                                }
+                                function previewImage(input, imgId, addMoreBtnId) {
+                                    const file = input.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = function (e) {
+                                            const imgElement = document.getElementById(imgId);
+                                            imgElement.src = e.target.result;
+                                            imgElement.style.display = 'block';
+                                            document.getElementById(addMoreBtnId).style.display = 'block';
+                                        }
+                                        reader.readAsDataURL(file);
+                                    }
+                                }
+                                function showNextSection(nextSectionId, btnId) {
+                                    if (imageCount < 15) {
+                                        document.getElementById(nextSectionId).style.display = 'grid';
+                                        document.getElementById(btnId).style.display = 'none';
+                                        imageCount++;
+                                    }
+                                    if (imageCount === 15) {
+                                        document.getElementById('maxImagesMsg').style.display = 'block';
+                                    }
+                                }
+                            </script>
+                    
+                            <div id="image_form_container">
+                                <script>
+                                    for (let i = 1; i <= 15; i++) {
+                                        document.write(`
+                                            <div id="section${i}" style="display: ${i === 1 ? 'grid' : 'none'}; grid-template-columns: 1fr 2fr; align-items: center; gap: 20px; margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #ddd;">
+                                                <input type="file" id="file${i}" name="images[]" accept="image/*" capture="environment" style="display:none;" onchange="previewImage(this, 'img${i}', 'btn${i}')">
+                                                <span style="font-size: 40px; cursor: pointer;" onclick="captureImage('file${i}')">📷</span>
+                                                <img id="img${i}" onclick="window.open(this.src, '_blank')" style="width: 100%; max-width: 150px; border-radius: 10px; cursor: pointer; display: none;">
+                                                <div>
+                                                    <textarea name="img_descriptions[]" placeholder="Enter description for Image ${i}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                                                </div>
+                                            </div>
+                                            ${i < 15 ? `<button type="button" id="btn${i}" onclick="showNextSection('section${i + 1}', 'btn${i}')" style="display: none; margin-top: 10px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Add More Images</button>` : ''}
+                                        `);
+                                    }
+                                </script>
+                            </div>
+                            {% comment %} <hr> {% endcomment %}
+                        <form>
                     </div>
                 </div>
 
@@ -286,73 +349,6 @@
                         <textarea name="img_des" rows="3" style="width:100%"></textarea>
                     </div>
                 </div> {% endcomment %}
-
-
-                <!-- Updated Wound Images and Information Section -->
-                <div class="form-section" id="pat_info_section">
-                    <h2>Wound Images and Information</h2>
-                    <p id="maxImagesMsg" style="display: none; color: red; font-weight: bold; text-align: center; margin-top: 10px;">
-                        More images cannot be added for this patient.
-                    </p>
-                
-                    <form method="post" action="{% url 'about' %}" onsubmit="return showSaveMessage()" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="hidden" name="row_id" value="{{ request.GET.row_id|default:'' }}">
-                
-                        <script>
-                            let imageCount = 1;
-                            function captureImage(inputId) {
-                                document.getElementById(inputId).click();
-                            }
-                            function previewImage(input, imgId, addMoreBtnId) {
-                                const file = input.files[0];
-                                if (file) {
-                                    const reader = new FileReader();
-                                    reader.onload = function (e) {
-                                        const imgElement = document.getElementById(imgId);
-                                        imgElement.src = e.target.result;
-                                        imgElement.style.display = 'block';
-                                        document.getElementById(addMoreBtnId).style.display = 'block';
-                                    }
-                                    reader.readAsDataURL(file);
-                                }
-                            }
-                            function showNextSection(nextSectionId, btnId) {
-                                if (imageCount < 15) {
-                                    document.getElementById(nextSectionId).style.display = 'grid';
-                                    document.getElementById(btnId).style.display = 'none';
-                                    imageCount++;
-                                }
-                                if (imageCount === 15) {
-                                    document.getElementById('maxImagesMsg').style.display = 'block';
-                                }
-                            }
-                        </script>
-                
-                        <div id="image_form_container">
-                            <script>
-                                for (let i = 1; i <= 15; i++) {
-                                    document.write(`
-                                        <div id="section${i}" style="display: ${i === 1 ? 'grid' : 'none'}; grid-template-columns: 1fr 2fr; align-items: center; gap: 20px; margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #ddd;">
-                                            <input type="file" id="file${i}" name="images[]" accept="image/*" capture="environment" style="display:none;" onchange="previewImage(this, 'img${i}', 'btn${i}')">
-                                            <span style="font-size: 40px; cursor: pointer;" onclick="captureImage('file${i}')">📷</span>
-                                            <img id="img${i}" onclick="window.open(this.src, '_blank')" style="width: 100%; max-width: 150px; border-radius: 10px; cursor: pointer; display: none;">
-                                            <div>
-                                                <textarea name="img_descriptions[]" placeholder="Enter description for Image ${i}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
-                                            </div>
-                                        </div>
-                                        ${i < 15 ? `<button type="button" id="btn${i}" onclick="showNextSection('section${i + 1}', 'btn${i}')" style="display: none; margin-top: 10px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Add More Images</button>` : ''}
-                                    `);
-                                }
-                            </script>
-                        </div>
-                        {% comment %} <hr> {% endcomment %}
-                    <form>
-                </div>
-            
-
-
-
 
 
                 <div class="form-section">

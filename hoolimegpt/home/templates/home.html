@@ -2,6 +2,8 @@
 
 {% block title %}Home{% endblock %}
 
+{% block css %}{% endblock css %}
+
 {% block content %}
 <style>
     /* Body Styling */
@@ -36,16 +38,17 @@
     }
 
     /* Styling for the sections */
-    {% comment %} .form-section-wrapper {
+    .form-section-wrapper {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         overflow: hidden;
-    }  {% endcomment %}
+    }
 
     .form-section {
         width: 100%;
+        max-width: 800px;
         background-color: #f9f9f9;
         border-radius: 10px;
         padding: 20px;
@@ -55,6 +58,11 @@
 
     .form-section.active {
         display: block; /* Show the active section */
+    }
+
+    .form-section h2 {
+        color: #333;
+        margin-bottom: 20px;
     }
 
     /* Styling for inputs and buttons */
@@ -120,8 +128,6 @@
 <div class="form-container">
     <div class="form-section-wrapper">
         {% if form %}
-            <form method="post" onsubmit="return showSaveMessage()" enctype="multipart/form-data">
-                {% csrf_token %}
                 <!-- Manually rendering fields for specific customizations -->
                 {% comment %} <div>
                     <label for="id_pat_info">Patient Info:</label>
@@ -141,7 +147,11 @@
                 </div> {% endcomment %}
                 
                 
-                <div class="form-section">
+            <div class="form-section">
+                    
+                <form method="post" onsubmit="return showSaveMessage()" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h2>Patient Information</h2>
                     <div>
                         <label for="id_name">Name:</label>
                         {{ form.name }}
@@ -179,70 +189,259 @@
                 </div>
 
                 <div class="form-section">
+                    <h2>Clinical Records</h2>
                     <div>
                         <label for="id_cli_rec">Clinical Records:</label>
                         <textarea id="id_cli_rec" name="cli_rec" rows="5" style="width:100%;">{{ form.cli_rec.value|default:'' }}</textarea>
                     </div>
                     <div>
-                        <label for="id_bims">BIMS:</label>
+                        <p><strong>Homebound Status:</strong><br>
+                        • Justify and mention AD type and level of assistance.</p>
+        
+                        <p><strong>Living Arrangements:</strong><br>
+                        • <strong>Home Safety:</strong> Evaluate the safety of the living environment, including the need for adaptive equipment or modifications.<br>
+                        • <strong>Support System:</strong> Document available family, friends, and community resources supporting the patient's care.<br>
+                        • <strong>Hazards:</strong> May include stairs, cluttered/soiled areas, pets, narrow paths, fire equipment, poor handling, tubing (O2, Foley).</p>
+        
+                        <p><strong>Immunizations:</strong><br>
+                        List received immunizations and dates:<br>
+                        1. Pneumonia<br>
+                        2. Flu<br>
+                        3. Tetanus<br>
+                        4. TB<br>
+                        5. Hep B<br>
+                        6. COVID</p>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>BIMS</h2>
+                    <div>
+                        <label for="id_bims">BIMS Summary Score C0500:</label>
                         <textarea id="id_bims" name="bims" rows="5" style="width:100%;">{{ form.bims.value|default:'' }}</textarea>
+                    </div>
+                    <div>
+                        <p><strong>Repetition of Three Words: Sock, Blue, Bed</strong><br>
+                        Ask the patient to repeat the words. You can repeat the words up to two more times.</p>
+        
+                        <p><strong>Scoring:</strong><br>
+                        • 0 points = no word | 1 = one word | 2 = two | 3 = three words</p>
+        
+                        <p><strong>Temporal Orientation: Year, Month, Day</strong></p>
+                        
+                        <p><strong>Year:</strong> What year is it right now?<br>
+                        • 0 points: Off by 5+ years or no answer<br>
+                        • 1 point: Off by 2-5 years<br>
+                        • 2 points: Off by 1 year<br>
+                        • 3 points: Correct year</p>
+        
+                        <p><strong>Month:</strong> What month are we in right now?<br>
+                        • 0 points: Off by more than one month or no answer.<br>
+                        • 1 point: Off by 6 days to 1 month.<br>
+                        • 2 points: Accurate within 5 days.</p>
+        
+                        <p><strong>Day:</strong> What day of the week is today?<br>
+                        • 0 points: Incorrect or no answer.<br>
+                        • 1 point: Correct.</p>
+        
+                        <p><strong>Recall:</strong><br>
+                        Ask the patient to recall the three words mentioned earlier (sock, blue, bed).</p>
+                        
+                        <p><strong>Scoring:</strong><br>
+                        • 0 points: Cannot recall the word.<br>
+                        • 1 point: Recalls after cueing.<br>
+                        • 2 points: Recalls without cueing.</p>
+        
+                        <p><strong>BIMS Summary Score:</strong><br>
+                        • Add the scores from the above sections (0-15).</p>
                     </div>
                 </div>
                 
                 <div class="form-section">
+                    <h2>CAMS</h2>
                     <div>
                         <label for="id_cams">CAMS:</label>
                         <textarea id="id_cams" name="cams" rows="5" style="width:100%;">{{ form.cams.value|default:'' }}</textarea>
                     </div>
-                    
+                    <div>
+                        <p><strong>CAM©: Signs and Symptoms of Delirium</strong></p>
+        
+                        <p><strong>Acute Onset of Mental Status Change:</strong><br>
+                        Is there evidence of an acute change in mental status from the patient's baseline?<br>
+                        0: No   ||   1: Yes   ||  Not Assessed/No Information</p>
+        
+                        <p><strong>Inattention:</strong><br>
+                        Did the patient have difficulty focusing attention, e.g., being easily distractible or having difficulty keeping track of what was being said?</p>
+        
+                        <p><strong>Scale:</strong><br>
+                        0: Behavior not present<br>
+                        1: Behavior continuously present, does not fluctuate<br>
+                        2: Behavior present, fluctuates (comes and goes, changes in severity)<br>
+                        3: Not Assessed/No Information</p>
+        
+                        <p><strong>Disorganized Thinking:</strong><br>
+                        Was the patient's thinking disorganized or incoherent (rambling or irrelevant conversation, unclear or illogical flow of ideas, unpredictable switching)?<br>
+                        Answer 0, 1, 2 or 3</p>
+        
+                        <p><strong>Altered Level of Consciousness:</strong><br>
+                        Did the patient have an altered level of consciousness, as indicated by:<br>
+                        • Vigilant: Startled easily<br>
+                        • Lethargic: Repeatedly dozed off when asked questions, but responded to voice or touch<br>
+                        • Stuporous: Very difficult to arouse and keep aroused for the interview<br>
+                        • Comatose: Could not be aroused<br>
+                        Answer 0, 1, 2 or 3</p>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>PHQ</h2>
                     <div>
                         <label for="id_phq">PHQ:</label>
                         <textarea id="id_phq" name="phq" rows="5" style="width:100%;">{{ form.phq.value|default:'' }}</textarea>
                     </div>
-                    
+                    <div>
+                        <p><strong>Patient Health Questionnaire (PHQ-2 & PHQ-9)</strong></p>
+        
+                        <p><strong>1. During the past two weeks, have you often been bothered by little interest or pleasure in doing things?</strong><br>
+                        (Yes/No)</p>
+        
+                        <p><strong>2. During the past two weeks, have you often been bothered by feeling down, depressed, or hopeless?</strong><br>
+                        (Yes/No)</p>
+                    </div>
                 </div>
                 
                 <div class="form-section">
+                    <h2>Physical Assessment</h2>
                     <div>
                         <label for="id_phy_ass">Physical Assessment:</label>
                         <textarea id="id_phy_ass" name="phy_ass" rows="5" style="width:100%;">{{ form.phy_ass.value|default:'' }}</textarea>
                     </div>
-                    
+                    <div>
+                        <p><strong>1. Vital Signs:</strong><br>
+                        • Blood pressure, pulse, respiration, SPO2, temperature<br>
+                        • Pain Level: (1-10 scale, site, duration, what makes it worse/better, medication use, effectiveness)</p>
+        
+                        <p><strong>2. Height and Weight</strong></p>
+        
+                        <p><strong>3. Neurological Assessment:</strong><br>
+                        • Evaluate mental status, orientation, and ability to understand/follow directions – any comments in addition to BIMS, CAM, and PHQ</p>
+        
+                        <p><strong>4. Cardiopulmonary Status:</strong><br>
+                        • Assess: Heart, lungs, respiratory rate, rhythm<br>
+                        • DOE: Severity rating/Oxygen use/Leg edema</p>
+        
+                        <p><strong>5. Integumentary Assessment:</strong><br>
+                        • Inspect skin for wounds, surgical sites, pressure ulcers<br>
+                        • Complete Wound Care Worksheet for all open wounds</p>
+        
+                        <p><strong>6. Endocrine:</strong><br>
+                        • DM: Yes/No. If Yes, include insulin (Yes/No), oral meds (Yes/No), RBS #</p>
+        
+                        <p><strong>7. Elimination Status:</strong><br>
+                        • Recent UTI, incontinence (Bowel and/or Bladder)<br>
+                        • Catheter: Yes/No (if Yes, provide care details)<br>
+                        • Ostomy: Yes/No (if Yes, provide care details)<br>
+                        • Any other symptoms noted</p>
+        
+                        <p><strong>8. Nutrition:</strong><br>
+                        • Ordered Diet, Appetite</p>
+        
+                        <p><strong>9. Mobility and Strength:</strong><br>
+                        • Evaluate the ability to move independently or with assistance<br>
+                        • Assistive Devices: Mention with/without assistance<br>
+                        • Activities permitted</p>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2>Range of Motion</h2>
                     <div>
                         <label for="id_rom">ROM:</label>
                         <textarea id="id_rom" name="rom" rows="5" style="width:100%;">{{ form.rom.value|default:'' }}</textarea>
                     </div>
-                    
+                    <div>
+                        <p><strong>1. ROM/Strength:</strong><br>
+                        • Example–MMT BUE and BLE grossly 3+/5. L side weaker than R. ROM of extremities WFL</p>
+        
+                        <p><strong>2. Additional Comments:</strong><br>
+                        • Example-paralysis, weakness, unsteady gait, antalgic gait, balance defect, limited ROM, fall risk</p>
+                    </div>
                 </div>
-                
+
                 <div class="form-section">
+                    <h2>Special Treatments, Procedures and Programs</h2>
                     <div>
                         <label for="id_spc_tre">Special Treatment:</label>
                         <textarea id="id_spc_tre" name="spc_tre" rows="5" style="width:100%;">{{ form.spc_tre.value|default:'' }}</textarea>
                     </div>
-                    
+                    <div>
+                        <p><strong>1. Respiratory Therapies</strong></p>
+        
+                        <p><strong>2. IV Medications/IV Access:</strong><br>
+                        • PICC line: Yes/No</p>
+        
+                        <p><strong>3. Dialysis:</strong><br>
+                        • Yes/No</p>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Service Requested</h2>
                     <div>
                         <label for="id_ser_req">Service Request:</label>
                         <textarea id="id_ser_req" name="ser_req" rows="5" style="width:100%;">{{ form.ser_req.value|default:'' }}</textarea>
                     </div>
+                    <div>
+                        <p><strong>Service requested for the following disciplines along with the frequency:</strong><br>
+                        SN (Skilled Nursing), PT (Physical Therapy), OT (Occupational Therapy), HHA (Home Health Aide), MSW (Medical Social Worker), ST (Speech Therapy)</p>
+                    </div>
                 </div>
                 
                 <div class="form-section">
+                    <h2>Clinical Summary</h2>
                     <div>
                         <label for="id_cli_sum">Clinical Summary:</label>
                         <textarea id="id_cli_sum" name="cli_sum" rows="5" style="width:100%;">{{ form.cli_sum.value|default:'' }}</textarea>
                     </div>
-                    
+                    <div>
+                        <p><strong>1. State the skilled need for home healthcare services:</strong></p>
+                        <p><strong>2. Spoke with ________@ Dr. ______ office on _________</strong></p>
+                        <p><strong>3. If there are any additional SOC findings not noted above in the systems review, add that here:</strong></p>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Medical Supplies</h2>
                     <div>
                         <label for="id_med_sup">Medical Supplies:</label>
                         <textarea id="id_med_sup" name="med_sup" rows="5" style="width:100%;">{{ form.med_sup.value|default:'' }}</textarea>
                     </div>
+                    <div>
+                        <p><strong>List any supplies needed to carry out patient care:</strong></p>
+                    </div>
                 </div>
                 
                 <div class="form-section">
+                    <h2>Goal</h2>
                     <div>
-                        <label for="id_goal">Goal:</label>
+                        <label for="id_goal">Goal and Interventions:</label>
                         <textarea id="id_goal" name="goal" rows="5" style="width:100%;">{{ form.goal.value|default:'' }}</textarea>
+                    </div>
+                    <div>
+                        <p><strong>What other Goals & Interventions besides the required high-risk medications, hospitalization risk, fall/home safety, emergency disaster planning, and review of systems are needed? See examples below:</strong></p>
+                        <ul>
+                            <li>DM</li>
+                            <li>Skin: wound care--location specific with treatment plan (frequency and dressing should be matched with mentioned in WC sheet)</li>
+                            <li>Symptoms (Pain, issues with vital signs, etc.)--pain G/I</li>
+                            <li>Picc line G/I for CT (only to assess site for S/S of infection and arm circumference)</li>
+                            <li>Ostomy G/I</li>
+                            <li>Catheter use G/I</li>
+                            <li>Lab orders G/I</li>
+                            <li>Skin breakdown/pressure relieving G/I in WC/BEDBOUND</li>
+                            <li>Infections G/I</li>
+                            <li>Therapy G/I</li>
+                            <li>Any other G/I you want added to POC</li>
+                        </ul>
                     </div>
                 </div>
 

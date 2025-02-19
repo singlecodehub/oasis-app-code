@@ -126,22 +126,14 @@
     }
 
     .tui-image-editor-container {
-        position: fixed;
-        top: 0;
+        position: absolute;
+        top: 80px;
         left: 0;
         display: none;
-        height: 100vh;
-        width: 100vw;
+        height: 100%;
+        width: 100%;
         z-index: 99;
         background-color: rgba(0, 0, 0, 0.5);
-    }
-    .tui-image-editor-container-wrapper {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-flow: column;
-        justify-content: center;
-        align-items: center;
     }
     .tui-image-editor-wrapper, #tui-image-editor {
         width: 700px;
@@ -159,10 +151,8 @@
 
 <!-- TUI Image editor -->
 <div class="tui-image-editor-container">
-    <div class="tui-image-editor-container-wrapper">
-        <div class="tui-image-editor-wrapper">
-            <div id="tui-image-editor"></div>
-        </div>
+    <div class="tui-image-editor-wrapper">
+        <div id="tui-image-editor"></div>
     </div>
 </div>
 
@@ -1309,8 +1299,12 @@
                 }
             },
             cssMaxWidth: 700,
-            cssMaxHeight: 500
-            });
+            cssMaxHeight: 500,
+            selectionStyle: {
+                cornerSize: 50,
+                rotatingPointOffset: 100,
+            },
+        });
     
         const imageEditorContainer = document.querySelector(".tui-image-editor-container");
         const tuiImageEditor = document.querySelector("#tui-image-editor");

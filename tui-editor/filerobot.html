@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+<script src="https://cdn.scaleflex.it/plugins/js-cloudimage-360-view/2.0.0/ci360.min.js"></script>
+<script src="https://cdn.scaleflex.it/filerobot-image-editor/latest/filerobot-image-editor.min.js"></script>
+
+<script>
+  const imageEditor = new FilerobotImageEditor({
+    elementId: 'filerobot-image-editor',
+    onSave: (imageData) => {
+      console.log('Edited image:', imageData);
+    }
+  });
+
+  document.getElementById('editImageButton').addEventListener('click', function() {
+    imageEditor.open('https://via.placeholder.com/300x200');
+  });
+</script>
+</body>
+</html>

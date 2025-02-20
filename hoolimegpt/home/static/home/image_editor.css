@@ -1,0 +1,39 @@
+#canvas-wrapper {
+    background-color: rgba(0, 0, 0, 0.2);
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
+    display: none;
+    z-index: 10000;
+}
+#canvas-inner {
+    height:  100%;
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+#canvas-inner > div {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    background-color: #98d9ff;
+    box-shadow: 0px 0px 3px 1px rgb(255, 250, 250);
+    width: 1280px;
+    height: 600px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+#canvas-navbar {
+    width: 100%;
+    height: 8%;
+}
+#canvas-container {
+    width: 100%;
+    height: 90%;
+    background-color: white;
+    overflow: auto;
+}

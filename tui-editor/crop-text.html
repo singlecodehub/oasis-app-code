@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Editor with Cropping & Text</title>
+    
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+
+    <style>
+        #image-container {
+            max-width: 100%;
+            text-align: center;
+            display: none;
+        }
+        #canvas-container {
+            display: none;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        img {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="file" id="imageInput" accept="image/*">
+    <button id="cropButton" style="display: none;">Crop</button>
+    <button id="editButton" style="display: none;">Edit</button>
+
+    <!-- Image Cropping Section -->
+    <div id="image-container">
+        <img id="croppingImage">
+    </div>
+
+    <!-- Image Editing Section -->
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+        <button onclick="addText()">Add Text</button>
+        <button onclick="saveImage()">Save</button>
+    </div>
+
+    <script>
+        const imageInput = document.getElementById("imageInput");
+        const croppingImage = document.getElementById("croppingImage");
+        const cropButton = document.getElementById("cropButton");
+        const editButton = document.getElementById("editButton");
+        const imageContainer = document.getElementById("image-container");
+        const canvasContainer = document.getElementById("canvas-container");
+        const canvas = new fabric.Canvas("canvas");
+
+        let cropper;
+        let croppedDataURL = "";
+
+        // Handle Image Selection
+        imageInput.addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                croppingImage.src = e.target.result;
+                imageContainer.style.display = "block";
+                cropButton.style.display = "inline-block";
+                editButton.style.display = "none";
+
+                if (cropper) {
+                    cropper.destroy();
+                }
+                cropper = new Cropper(croppingImage, {
+                    aspectRatio: 1, // Change as needed
+                    viewMode: 2
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Handle Cropping
+        cropButton.addEventListener("click", function() {
+            croppedDataURL = cropper.getCroppedCanvas().toDataURL("image/png");
+            cropper.destroy();
+            imageContainer.style.display = "none";
+            editButton.style.display = "inline-block";
+        });
+
+        // Load Cropped Image into Fabric.js for Editing
+        editButton.addEventListener("click", function() {
+            fabric.Image.fromURL(croppedDataURL, function(img) {
+                canvas.clear();
+                img.set({ selectable: true });
+                canvas.add(img);
+                canvas.setWidth(img.width);
+                canvas.setHeight(img.height);
+                canvasContainer.style.display = "block";
+            });
+        });
+
+        // Add Text to Image
+        function addText() {
+            const text = new fabric.Text("Your Text", {
+                left: 100,
+                top: 100,
+                fontSize: 20,
+                fill: "red"
+            });
+            canvas.add(text);
+            canvas.renderAll();
+        }
+
+        // Save Image
+        function saveImage() {
+            const dataURL = canvas.toDataURL("image/png");
+
+            // Convert Data URL to Blob
+            fetch(dataURL)
+                .then(res => res.blob())
+                .then(blob => {
+                    const file = new File([blob], "edited-image.png", { type: "image/png" });
+
+                    // Create a new DataTransfer object and assign it to the input
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    imageInput.files = dataTransfer.files;
+                    
+                    alert("Image saved!");
+                });
+        }
+    </script>
+
+</body>
+</html>

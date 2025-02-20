@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customized TUI Image Editor</title>
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.min.css">
+</head>
+<body>
+  <h1>Edit Uploaded Image</h1>
+  <input type="file" id="imageUpload" accept="image/*">
+  <button id="openEditorBtn">Open Editor</button>
+  <div id="tui-image-editor" style="display: none;"></div>
+  <img id="editedImagePreview" src="" alt="Edited Image Preview" style="display: none;" height="300px" width="500px">
+
+  <!-- TUI dependencies -->
+  <script src="https://uicdn.toast.com/tui-code-snippet/latest/tui-code-snippet.js"></script>
+  <script src="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.min.js"></script>
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.css">
+  <script src="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.min.js"></script>
+
+  <script>
+    let uploadedImageSrc = '';
+    const imageEditor = new tui.ImageEditor('#tui-image-editor', {
+      includeUI: {
+        theme: {},
+        menu: ['crop', 'flip', 'rotate', 'draw', 'text', 'filter'], // Customize the features here
+        initMenu: 'filter',
+        uiSize: {
+          width: '100%',
+          height: '700px'
+        }
+      },
+      cssMaxWidth: 700,
+      cssMaxHeight: 500
+    });
+
+    // Load the uploaded image
+    document.getElementById('imageUpload').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedImageSrc = e.target.result;
+          document.getElementById('openEditorBtn').disabled = false;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Open editor and load uploaded image
+    document.getElementById('openEditorBtn').addEventListener('click', function() {
+      document.getElementById('tui-image-editor').style.display = 'block';
+      imageEditor.loadImageFromURL(uploadedImageSrc, 'Uploaded Image')
+        .then(() => {
+          console.log('Image loaded into editor');
+          imageEditor.clearUndoStack();
+        })
+        .catch(err => {
+          console.error('Error loading image:', err);
+        });
+    });
+
+    // Save the edited image and place it in the input field or send it as a JSON response
+    document.getElementById('tui-image-editor').addEventListener('click', function() {
+      const editedImageDataURL = imageEditor.toDataURL();
+      document.getElementById('editedImagePreview').src = editedImageDataURL;
+      document.getElementById('editedImagePreview').style.display = 'block';
+
+      // Example: You can send this Base64 image to your server via AJAX or place it in an input field
+      console.log('Edited Image Base64:', editedImageDataURL);
+    });
+  </script>
+</body>
+</html>

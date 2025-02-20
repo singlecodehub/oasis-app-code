@@ -485,8 +485,8 @@
                 <div class="form-section">
                     <h2>Wound Images and Information</h2>
                     <div>
-                        <label>Images:</label>
                         {% if images|length > 0%}
+                            <label>Images:</label>
                             {% for image in images %}
                                 <div style="margin-bottom: 30px;">
                                     <div id="image_{{ image.id }}" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">

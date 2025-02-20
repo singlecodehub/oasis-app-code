@@ -550,3 +550,9 @@ def capture_and_edit(request):
 
 
 
+def extract(request):
+    return render(
+        request,
+        "ocr_extract.html",
+        {}
+    )

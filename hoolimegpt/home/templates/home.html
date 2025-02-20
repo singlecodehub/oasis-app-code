@@ -492,7 +492,6 @@
                                     <div id="image_{{ image.id }}" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                                         <img src="{{ image.img.url }}" alt="Image" style="max-width: 150px; height: auto;">
                                         <button type="button" style="width: 120px" onclick="removeImage({{ image.id }})">Remove</button>  <!-- Image and button on the same line -->
-                                        <button type="button" style="width: 120px" onclick="editImage({{ image.id }})">Edit</button>     <!-- Edit image button on same line-->
                                     </div>
                                     <div style="margin-top: 10px;">
                                         <label for="id_img_des_">Image Description:</label>
@@ -519,6 +518,7 @@
                             <script>
                                 let imageCount = 1;
                                 function captureImage(inputId) {
+                                    console.log("Something is happening")
                                     document.getElementById(inputId).click();
                                 }
                                 function previewImage(input, imgId, addMoreBtnId) {
@@ -547,6 +547,7 @@
                             </script>
                     
                             <div id="image_form_container">
+                                <p><span>You can add total of 15 images.</span></p>
                                 <script>
                                     for (let i = 1; i <= 15; i++) {
                                         document.write(`
@@ -1123,7 +1124,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    imageContainer.remove();
+                    imageContainer.parentElement.remove();
                 } else {
                     alert("Failed to remove image: " + data.message);
                 }

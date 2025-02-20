@@ -49,6 +49,7 @@ urlpatterns = [
 
     path('capture-and-edit/', capture_and_edit, name='capture_and_edit'),
 
+    path("extract/", extract, name="ocr_extract"),
 
 
     # path('send-otp/', send_otp, name='send_otp'),

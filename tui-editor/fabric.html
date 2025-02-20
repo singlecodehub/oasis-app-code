@@ -3,85 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Editor with Upload</title>
+    <title>Dynamic Shape Highlighting</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-    <style>
-        #canvas-container {
-            width: 500px;
-            height: 500px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-        }
-        canvas {
-            max-width: 100%;
-            max-height: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="fabric/index.css">
 </head>
 <body>
 
-    <input type="file" id="imageInput" accept="image/*">
-    <button onclick="addText()">Add Text</button>
-    <button onclick="saveImage()">Save</button>
+    <button class="btn btn-primary" id="uploadImage">Upload Image</button>
+    <input hidden type="file" id="imageInput" accept="image/*">
 
-    <div id="canvas-container">
-        <canvas id="canvas"></canvas>
+    <div id="canvas-wrapper">
+        <div id="canvas-inner">
+            <div id="">
+                <div class="d-flex justify-content-between px-3" id="canvas-navbar">
+                    <div>
+                        <label class="ms-1" for="shapeSelector">Select Shape: </label>
+                        <select class="p-2" id="shapeSelector">
+                            <option value="">Select</option>
+                            <option value="rectangle">Rectangle</option>
+                            <option value="circle">Circle</option>
+                            <option value="text">Text</option>
+                        </select>
+                        <button class="ms-3 me-1 btn btn-danger btn" onclick="removeObject()">Remove</button>
+                    </div>
+                    <div>
+                        <button class="mx-1 btn btn-success btn" onclick="saveImage()">Save</button>
+                        <button class="mx-1 btn btn-secondary btn" onclick="downloadImage()">Download</button>
+                        <button class="mx-1 btn btn-danger btn" onclick="closeOverlay()">close</button>
+                    </div>
+                    
+                </div>
+                <div id="canvas-container">
+                    <canvas id="canvas"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script>
-        const imageInput = document.getElementById("imageInput");
-        const canvas = new fabric.Canvas("canvas");
-        let imageObj = null;
-
-        // Handle file input change
-        imageInput.addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                fabric.Image.fromURL(e.target.result, function(img) {
-                    canvas.clear();
-                    imageObj = img;
-                    img.set({ selectable: true });
-                    canvas.add(img);
-                    canvas.renderAll();
-                });
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // Function to add text to the image
-        function addText() {
-            const text = new fabric.Text("Your Text", {
-                left: 100,
-                top: 100,
-                fontSize: 20,
-                fill: "red"
-            });
-            canvas.add(text);
-            canvas.renderAll();
-        }
-
-        // Save the edited image back to the input
-        function saveImage() {
-            const dataURL = canvas.toDataURL("image/png");
-
-            // Convert Data URL to Blob
-            fetch(dataURL)
-                .then(res => res.blob())
-                .then(blob => {
-                    const file = new File([blob], "edited-image.png", { type: "image/png" });
-
-                    // Create a new DataTransfer object and assign it to the input
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    imageInput.files = dataTransfer.files;
-                    
-                    alert("Image saved!");
-                });
-        }
-    </script>
+    <script src="fabric/index.js" defer></script>
 
 </body>
 </html>

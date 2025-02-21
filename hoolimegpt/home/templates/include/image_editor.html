@@ -3,19 +3,19 @@
     <div id="">
       <div class="d-flex justify-content-between px-3" id="canvas-navbar">
         <div>
-          <label class="ms-1" for="shapeSelector">Select Shape:</label>
+          <label class="ms-1 text-light" for="shapeSelector">Select Shape:</label>
           <select class="p-2" style="width: max-content; padding: 0; margin: 0" id="shapeSelector">
             <option value="">Select</option>
             <option value="rectangle">Rectangle</option>
             <option value="circle">Circle</option>
             <option value="text">Text</option>
           </select>
-          <button type="button" class="ms-3 me-1 btn btn-danger btn" onclick="removeObject()">Remove</button>
+          <button type="button" class="ms-3 me-1 btn btn-danger btn" onclick="removeObject()"><i class="bi bi-trash3"></i></button>
         </div>
         <div>
-          <button type="button" class="mx-1 btn btn-success btn" onclick="saveImage()">Save</button>
-          <button type="button" class="mx-1 btn btn-secondary btn" onclick="downloadImage()">Download</button>
-          <button type="button" class="mx-1 btn btn-danger btn" onclick="closeOverlay()">close</button>
+          <button type="button" class="mx-1 btn btn-dark btn" onclick="saveImage()"><i class="bi bi-floppy-fill"></i></button>
+          <button type="button" class="mx-1 btn btn-dark btn" onclick="downloadImage()"><i class="bi bi-download"></i></button>
+          <button type="button" class="mx-1 btn btn-dark btn" onclick="closeOverlay()"><i class="bi bi-x-lg"></i></button>
         </div>
       </div>
       <div id="canvas-container">

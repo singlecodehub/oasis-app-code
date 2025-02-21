@@ -37,3 +37,11 @@
     background-color: #2d2c2c;
     overflow: auto;
 }
+
+
+@media screen  and (max-width: 1280px ){
+    #canvas-inner > div {
+        width: 900px;
+        height: 600px;
+    }
+}

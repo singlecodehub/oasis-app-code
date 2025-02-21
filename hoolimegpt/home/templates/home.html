@@ -573,7 +573,6 @@
                             </script>
                     
                             <div id="image_form_container">
-                                <p><span>You can add total of 15 images.</span></p>
                                 <script>
                                     for (let i = 1; i <= 15; i++) {
                                         document.write(`
@@ -582,7 +581,7 @@
                                                 <span style="font-size: 40px; cursor: pointer;" onclick="captureImage('file${i}')">📷</span>
                                                 <img id="img${i}" onclick="window.open(this.src, '_blank')" style="width: 100%; max-width: 150px; border-radius: 10px; cursor: pointer; display: none;">
                                                 <div>
-                                                    <textarea name="img_descriptions[]" placeholder="Enter description for Image ${i}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                                                    <textarea name="img_descriptions[]" placeholder="Enter description for Image" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
                                                 </div>
                                             </div>
                                             ${i < 15 ? `<button type="button" id="btn${i}" onclick="showNextSection('section${i + 1}', 'btn${i}')" style="display: none; margin-top: 10px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Add More Images</button>` : ''}

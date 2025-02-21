@@ -27,12 +27,12 @@ urlpatterns = [
     # path('', about, name='home'),
     path('', pending, name='pending'),
     path('edit/<int:id>/', home, name='edit_oasis_info'),
-    
+
     path('about/', about, name='about'),
 
     path('pending/', pending, name='pending'),
     path('pending/', pending_oasis_forms, name='pending_oasis_forms'),
-    
+
     path('complete/', complete, name='complete'),
     path("admin/", admin.site.urls),
 
@@ -42,7 +42,7 @@ urlpatterns = [
 
     path('img_view/', about, name='img_view.html'),
 
-    path('home/<int:id>/', home, name='home'), 
+    path('home/<int:id>/', home, name='home'),
     path('home/', home, name='home'),
     path('remove_image/', remove_image, name='remove_image'),
 
@@ -50,6 +50,8 @@ urlpatterns = [
     path('capture-and-edit/', capture_and_edit, name='capture_and_edit'),
 
     path("extract/", extract, name="ocr_extract"),
+
+    # path("transcription/", transcription_view, name="transcription")
 
 
     # path('send-otp/', send_otp, name='send_otp'),
@@ -60,11 +62,11 @@ urlpatterns = [
     # path('send-reset-link/', send_reset_link, name='send_reset_link'),
 
 
-    
 
 
-    
-    
+
+
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

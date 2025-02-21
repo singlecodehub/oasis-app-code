@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 from .forms import UserInfoForm, ImageForm
 from .models import OasisInfo, Image, Mandatory_Documents
 from django.shortcuts import render
@@ -9,13 +10,15 @@ from django.http import JsonResponse
 from datetime import datetime
 import json
 
+# from . import transcription
+
 
 @login_required
 # def home(request, id=None):
 #     instance = None
 #     images = []
 
-#     if id: 
+#     if id:
 #         instance = get_object_or_404(OasisInfo, id=id)
 
 #     if request.method == 'POST':
@@ -71,7 +74,7 @@ def home(request, id=None):
     images = []
     mandatory_documents = None
 
-    if id: 
+    if id:
         instance = get_object_or_404(OasisInfo, id=id)
         mandatory_documents = Mandatory_Documents.objects.filter(oasis_info=instance).first()
 
@@ -152,7 +155,7 @@ def remove_image(request):
     if request.method == 'POST':
         try:
             body = json.loads(request.body)
-            
+
             image_id = body.get('image_id')
 
             if not image_id:
@@ -188,7 +191,7 @@ def remove_image(request):
 
 #         if request.FILES.getlist('images[]'):
 #             img_des_list = request.POST.getlist('img_descriptions[]')  # Get all descriptions
-            
+
 #             for i, img in enumerate(request.FILES.getlist('images[]')):
 #                 img_des = img_des_list[i] if i < len(img_des_list) else ""  # Match description with image
 
@@ -236,10 +239,10 @@ def about(request):
 
         # Save Images with Descriptions
         if request.FILES.getlist('images[]'):
-            img_des_list = request.POST.getlist('img_descriptions[]')  
+            img_des_list = request.POST.getlist('img_descriptions[]')
 
             for i, img in enumerate(request.FILES.getlist('images[]')):
-                img_des = img_des_list[i] if i < len(img_des_list) else ""  
+                img_des = img_des_list[i] if i < len(img_des_list) else ""
 
                 image_instance = Image(
                     oasis_info=oasis_info,
@@ -302,7 +305,7 @@ def pending(request):
                 row.visit_date = datetime.strptime(row.visit_date, "%Y-%m-%d")
             except ValueError:
                 row.visit_date = None
-    
+
     return render(request, 'pending.html', {'rows': rows})
 
 
@@ -321,7 +324,7 @@ def complete(request):
                 row.visit_date = datetime.strptime(row.visit_date, "%Y-%m-%d")
             except ValueError:
                 row.visit_date = None
-                
+
     return render(request, 'completed.html', {'rows': rows})
 
 @login_required
@@ -331,7 +334,7 @@ def pending_oasis_forms(request):
         rows = OasisInfo.objects.filter(name__icontains=search_query) | OasisInfo.objects.filter(mrn__icontains=search_query)
     else:
         rows = OasisInfo.objects.all()
-    
+
     return render(request, 'pending_oasis_forms.html', {'rows': rows})
 
 @login_required
@@ -401,9 +404,9 @@ def capture_and_edit(request):
 #             if not mobile_number or not otp:
 #                 return JsonResponse({'error': 'Mobile number and OTP are required'}, status=400)
 #             if otp_store.get(mobile_number) == otp:
-#                 del otp_store[mobile_number] 
+#                 del otp_store[mobile_number]
 #                 request.session['verified_mobile_number'] = mobile_number
-                
+
 #                 # If a redirect URL is provided, use it
 #                 if redirect_url:
 #                     return JsonResponse({'message': 'OTP verified successfully', 'redirect_url': redirect_url}, status=200)
@@ -556,3 +559,12 @@ def extract(request):
         "ocr_extract.html",
         {}
     )
+
+
+# @login_required
+# @csrf_exempt
+# def transcription_view(request):
+#     if request.method == "POST":
+#         result = transcription.transcribe_audio("/home/paradox/Downloads/harvard.wav")
+#         return JsonResponse({"success": True, "result": result['text']})
+#     return JsonResponse({"success": False})

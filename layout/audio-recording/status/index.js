@@ -1,5 +1,6 @@
 console.log("Testing recording")
 
+
 class Record {
 
     recording = false;
@@ -24,18 +25,22 @@ class Record {
 
     speechToText = function (data) {
         this.currentTextArea.innerText = data;
-        // console.log(this.currentTextArea.innerText);
     }
 
     recorder = function () {
-        document.querySelectorAll(".record").forEach(async e => {
-            e.addEventListener("click", async (e) => {
-                this.currentTextArea = e.target.parentNode.parentNode.children[1];
+        this.audioPlayBack.src = "";
+        document.querySelectorAll(".record-box").forEach(async (e) => {
+            const button = e.firstElementChild;
+            button.addEventListener("click", async () => {
+                this.currentTextArea = e.lastElementChild;
                 this.initializerRecorder();
                 this.recording = !this.recording;
                 this.recordingActive = !this.recordingActive;
 
             })
+        })
+        document.querySelectorAll(".record").forEach(async e => {
+            
         })
     }
     closeRecorder = () => {
@@ -51,7 +56,6 @@ class Record {
 
     initializerRecorder = async () => {
         try {
-            this.openOverLay();
             // request microphone access
             const stream = await navigator.mediaDevices.getUserMedia({audio: true});
             // initialize media recorder
@@ -63,12 +67,15 @@ class Record {
                 }
             }
             this.mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(this.audioChunk, {type: "audio/webm"});
+                const audioBlob = new Blob(this.audioChunk, {type: "audio/mp3"});
                 const audioUrl = URL.createObjectURL(audioBlob);
                 this.audioPlayBack.src = audioUrl;
                 this.audioChunk = [];
             }
             this.mediaRecorder.start();
+
+
+            this.openOverLay();
         } catch(e) {
             alert("Unable to get microphone access");
         }

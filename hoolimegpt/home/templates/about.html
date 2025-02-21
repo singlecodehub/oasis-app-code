@@ -1,6 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Home{% endblock %}
+
+
+{% block css %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+{% endblock css %}
 
 {% block content %}
 <style>
@@ -514,6 +521,9 @@
                 </div>
         </div> {% endcomment %}
 
+        {% include "include/image_editor.html" %}
+        <link rel="stylesheet" href="{% static "home/image_editor.css" %}">     
+
 
         <!-- Updated Wound Images and Information Section -->
         <div class="form-section" id="pat_info_section">
@@ -532,16 +542,40 @@
                         document.getElementById(inputId).click();
                     }
                     function previewImage(input, imgId, addMoreBtnId) {
+                        currentInput = input;
+                        currentImageId = imgId;
+                        currentAddMoreBtnId = addMoreBtnId;
+
+                        console.log(currentInput, currentImageId, currentAddMoreBtnId);
+
                         const file = input.files[0];
                         if (file) {
                             const reader = new FileReader();
                             reader.onload = function (e) {
+
+                            currentReaderOnLoadEvent = e;
+                                /*
                                 const imgElement = document.getElementById(imgId);
                                 imgElement.src = e.target.result;
                                 imgElement.style.display = 'block';
                                 document.getElementById(addMoreBtnId).style.display = 'block';
+                                */
+                                fabric.Image.fromURL(e.target.result, function(img) {
+                                    canvas.clear();
+                                    img.set({ 
+                                        selectable: false,
+                                        top: 0,
+                                    }); // Make the image non-selectable
+                                    canvas.setWidth(img.width);
+                                    canvas.setHeight(img.height);
+                        
+                                    canvas.add(img);
+                                    canvas.renderAll();
+                                });
                             }
                             reader.readAsDataURL(file);
+
+                            openOverlay();
                         }
                     }
                     function showNextSection(nextSectionId, btnId) {
@@ -573,6 +607,8 @@
                         }
                     </script>
                 </div>
+                
+                <script src="{% static "home/image_editor.js" %}"></script>
 
         </div>
 

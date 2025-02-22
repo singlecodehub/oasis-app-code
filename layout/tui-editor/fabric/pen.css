@@ -1,0 +1,65 @@
+#canvas-wrapper {
+    background-color: rgba(0, 0, 0, 0.2);
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
+    display: none;
+}
+#canvas-inner {
+    height:  100%;
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+#canvas-inner > div {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    background-color: #1a1d1e;
+    box-shadow: 0px 0px 2px 1px rgb(70, 70, 70);
+    width: 1280px;
+    height: 600px;
+    border: 1px solid #414040;
+    margin-top: 10px;
+}
+#canvas-navbar {
+    width: 100%;
+    height: 15%;
+}
+#canvas-container {
+    border-radius: 12px;
+    width: 100%;
+    height: 80%;
+    background-color: white;
+    overflow: auto;
+    background-color: #414040;
+}
+
+@media screen and (max-width: 1280px) {
+    #canvas-inner > div {
+        width: 700px;
+        height: 600px;
+    }
+}
+@media screen and (max-width: 650px) {
+    #canvas-inner > div {
+        width: 400px;
+        height: 600px;
+    }
+}
+@media screen and (max-width: 400px) {
+    
+    #canvas-inner > div {
+        width: 300px;
+    }
+    #canvas-navbar {
+        flex-flow: column-reverse;
+    }
+    #canvas-navbar > div {
+        margin: 10px;
+    }
+}

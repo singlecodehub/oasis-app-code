@@ -1,10 +1,20 @@
+const $ = (id) => {
+    return document.getElementById(id);
+}
+
+const colorEl = $("color-select");
+const strokeEidth = $('stroke-width');
 const imageInput = document.getElementById("imageInput");
 const shapeSelector = document.getElementById("shapeSelector");
 const canvasWrapper = document.getElementById("canvas-wrapper");
-const canvas = new fabric.Canvas("canvas");
+const canvas = new fabric.Canvas(document.getElementById("canvas"), {
+    isDrawingMode: true,
+});
+canvas.freeDrawingBrush = new fabric.PencilBrush(canvas)
+let canvasJsonState = []; 
+let canvasInitialState = []
 
 let newFileName = null;
-
 function setFileName() {
     newFileName = `${imageInput.files[0].name}`
 }
@@ -14,12 +24,16 @@ document.getElementById("uploadImage").addEventListener("click", () => {
 
 })
 
+colorEl.onchange = (e) => {
+    canvas.freeDrawingBrush.color = e.target.value;
+}
+strokeEidth.onchange = (e) => {
+    canvas.freeDrawingBrush.width = e.target.value;
+}
 
 let overLay = false;
 let isDrawing = false;
 let shape = null;  // The current shape being drawn
-
-
 // open overlay
 const openOverlay = () => {
     overLay = true;
@@ -28,6 +42,7 @@ const openOverlay = () => {
 // close overlay
 const closeOverlay = () => {
     overLay = false;
+    imageInput.value = "";
     canvasWrapper.style.display = "none";
 }
 
@@ -58,110 +73,6 @@ imageInput.addEventListener("change", function(event) {
 });
 
 
-// Paint
-class PaintBrush {
-    #shape = null
-
-    constructor() {
-        this.shape = new fabric.PencilBrush(canvas);
-    }
-
-    getBrush = () => {
-        return this.shape;
-    }
-}
-const paintBrush = new PaintBrush();
-
-// Start drawing when mouse is pressed
-canvas.on("mouse:down", function(event) {
-    
-    isDrawing = true;
-    const pointer = canvas.getPointer(event.e);
-    const shapeType = shapeSelector.value;
-
-    if (shapeType === "") {
-        return
-    }
-
-    // Create shape based on user selection
-    if (shapeType === "rectangle") {
-        shape = new fabric.Rect({
-            left: pointer.x,
-            top: pointer.y,
-            width: 0,
-            height: 0,
-            stroke: "blue",
-            strokeWidth: 2,
-            fill: "rgba(0, 0, 0, 0)", // Transparent fill
-            selectable: true
-        });
-    } else if (shapeType === "circle") {
-        shape = new fabric.Ellipse({
-            left: pointer.x,
-            top: pointer.y,
-            rx: 0,  // Radius X
-            ry: 0,  // Radius Y
-            stroke: "red",
-            strokeWidth: 2,
-            fill: "rgba(0, 0, 0, 0)", // Transparent fill
-            selectable: true
-        });
-    } else if (shapeType === "text") {
-        shape = new fabric.IText("Tap and Type", {
-            fontFamily: 'arial black',
-            left: pointer.x,
-            top: pointer.y,
-            fill: "red", // Transparent fill
-            selectable: true
-        });
-    } else if (shapeType === "pen") {
-        shape = paintBrush.getBrush();
-    }
-
-    canvas.add(shape);
-});
-
-
-// Update shape size as the user drags the mouse
-canvas.on("mouse:move", function(event) {
-    if (!isDrawing || !shape) return;
-
-    const pointer = canvas.getPointer(event.e);
-    const originX = shape.left;
-    const originY = shape.top;
-
-    if (shape.type === "rect") {
-        shape.set({
-            width: Math.abs(pointer.x - originX),
-            height: Math.abs(pointer.y - originY)
-        });
-    } else if (shape.type === "ellipse") {
-        shape.set({
-            rx: Math.abs(pointer.x - originX) / 2,
-            ry: Math.abs(pointer.y - originY) / 2,
-            left: Math.min(pointer.x, originX),
-            top: Math.min(pointer.y, originY)
-        });
-    } else if (shape.type === "text") {
-        shape.set({
-            rx: Math.abs(pointer.x - originX) / 2,
-            ry: Math.abs(pointer.y - originY) / 2,
-            left: Math.min(pointer.x, originX),
-            top: Math.min(pointer.y, originY)
-        });
-    }
-
-    canvas.renderAll();
-});
-
-// Finish drawing when the mouse is released
-canvas.on("mouse:up", function() {
-    isDrawing = false;
-    shape = null;  // Reset the current shape
-
-    // reset shape selection to null
-    shapeSelector.value = ""
-});
 
 // remove active Fabric js object
 function removeObject() {
@@ -195,6 +106,8 @@ function changeInput(file) {
 
 // Save the edited image
 function saveImage() {
+    canvas.renderAll();
+
     const dataURL = canvas.toDataURL("image/png");
 
     // set name of the new file
@@ -213,3 +126,24 @@ function saveImage() {
             alert("Image with highlights saved!");
         });
 }
+
+
+const clearCanvas = () => {
+    canvas.loadFromJSON(canvasInitialState[0]);
+}
+
+const undoCanvas = () => {
+    if (canvasJsonState.length === 0) {
+        return
+    }
+    const lastState = canvasJsonState.pop();
+    canvas.loadFromJSON(lastState);
+}
+
+canvas.on("mouse:down", (event) => {
+    if (canvasInitialState.length === 0)
+        canvasInitialState.push(canvas.toJSON());
+    canvasJsonState.push(canvas.toJSON());
+}) 
+
+

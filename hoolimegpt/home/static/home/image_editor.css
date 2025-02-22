@@ -6,7 +6,6 @@
     height: 100vh;
     width: 100vw;
     display: none;
-    z-index: 10000;
 }
 #canvas-inner {
     height:  100%;
@@ -20,28 +19,47 @@
     margin: 10px;
     padding: 10px;
     border-radius: 12px;
-    background-color: #3c3c3c;
-    box-shadow: 0px 0px 3px 1px rgb(184, 183, 183);
+    background-color: #1a1d1e;
+    box-shadow: 0px 0px 2px 1px rgb(70, 70, 70);
     width: 1280px;
     height: 600px;
-    border: 1px solid #ccc;
+    border: 1px solid #414040;
     margin-top: 10px;
 }
 #canvas-navbar {
     width: 100%;
-    height: 8%;
+    height: 15%;
 }
 #canvas-container {
+    border-radius: 12px;
     width: 100%;
-    height: 90%;
-    background-color: #2d2c2c;
+    height: 80%;
+    background-color: white;
     overflow: auto;
+    background-color: #414040;
 }
 
-
-@media screen  and (max-width: 1280px ){
+@media screen and (max-width: 1280px) {
     #canvas-inner > div {
-        width: 900px;
+        width: 700px;
         height: 600px;
+    }
+}
+@media screen and (max-width: 650px) {
+    #canvas-inner > div {
+        width: 400px;
+        height: 600px;
+    }
+}
+@media screen and (max-width: 400px) {
+    
+    #canvas-inner > div {
+        width: 300px;
+    }
+    #canvas-navbar {
+        flex-flow: column-reverse;
+    }
+    #canvas-navbar > div {
+        margin: 10px;
     }
 }

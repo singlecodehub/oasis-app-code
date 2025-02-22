@@ -14,11 +14,11 @@
     /* Body Styling */
     body {
         font-family: 'Arial', sans-serif;
-        background-color: #f4f7fc;
+        background-color:rgb(255, 255, 255);
         color: #333;
         margin: 0;
-        padding: 0;
-        padding-bottom: 60px; /* Ensure content doesn't get hidden behind fixed buttons */
+        padding-bottom: 80px; /* Ensure content doesn't get hidden behind fixed buttons */
+
     }
 
     h1 {
@@ -36,11 +36,10 @@
     /* Container for form and navigation */
     .form-container {
         max-width: 1000px;
-        margin: 30px auto;
+        margin: 10px auto;
         padding: 20px;
-        background-color: #fff;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        
     }
 
     /* Styling for the sections */
@@ -55,10 +54,11 @@
     .form-section {
         width: 100%;
         max-width: 800px;
-        background-color: #f9f9f9;
+        background-image: linear-gradient(to right, rgb(210, 238, 250), rgb(221, 236, 250));
         border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 40px 20px;
+        margin: 10px;
+        box-shadow: 0 0 4px 1px rgba(29, 29, 29, 0.3);
         display: none; /* Initially hide all sections */
     }
 
@@ -68,7 +68,9 @@
 
     .form-section h2 {
         color: #333;
-        margin-bottom: 20px;
+        padding: 20px;
+        text-align: center;
+        border-radius: 12px;
     }
 
     /* Styling for inputs and buttons */
@@ -100,23 +102,27 @@
     }
 
     /* Fixing the buttons at the bottom of the screen */
-    .navigation-buttons {
+    .navigation-buttons-container {
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        background-color: white; /* Optional: Background color for visibility */
-        padding: 10px 10px;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         z-index: 1000; /* Ensures buttons appear above other content */
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Optional: Shadow effect */
+    }
+    .navigation-buttons {
+        width: max-content;
+        padding: 10px 20px;  
+        background-color:rgb(46, 46, 46);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        display: flex;
     }
 
     .navigation-buttons button {
-        flex-grow: 1; /* Make buttons flexible */
         margin: 0 5px; /* Add some margin for spacing */
-        min-width: 100px; /* Ensure a minimum button width */
+        min-width: 130px; /* Ensure a minimum button width */
         padding: 6px
     }
 
@@ -127,16 +133,15 @@
         }
 
         .navigation-buttons button {
-            flex-grow: 1; /* Allow buttons to stretch if needed */
-            max-width: 30%; /* Limit the button width on small screens */
-            margin: 5px;
+            width: 50px; /* Limit the button width on small screens */
+            margin: 3px;
         }
     }
 </style>
 
 
 
-<h1>OASIS Form</h1>
+<h1 class="">OASIS Form</h1>
 <p class="text-center">Please enter the patient's information.</p>
 
 <div class="form-container">
@@ -1067,12 +1072,14 @@
         </div>
     </div>
 
-    <!-- Navigation Buttons -->
-    <div class="navigation-buttons">
-        <button type="button" onclick="previousSection()">Previous</button>
-        <button type="submit" class="btn btn-success">Save</button>
-        <button type="button" onclick="nextSection()">Next</button>
-    </div>
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons-container">
+            <div class="navigation-buttons">
+                <button type="button" onclick="previousSection()">Previous</button>
+                <button type="submit" class="btn btn-success">Save</button>
+                <button type="button" onclick="nextSection()">Next</button>
+            </div>
+        </div>
     </form>
 </div>
 

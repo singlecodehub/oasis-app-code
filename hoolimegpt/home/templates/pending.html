@@ -3,7 +3,32 @@
 {% block title %}Pending Oasis Forms{% endblock %}
 
 {% block content %}
-<div style="text-align: center; margin-bottom: 30px;">
+
+
+<style>
+    #rowContainer {
+        margin-bottom: 40px
+    }
+    .rowBox {
+        border: 2px solid #dc3545;
+        background-color: #f8d7da; 
+        padding: 25px; 
+        border-radius: 15px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+        transition: all 0.3s ease; margin-left: auto; 
+        margin-right: auto;
+    }
+    .rowBox > div {
+        
+        background-color: inherit;
+        border-radius: inherit;
+    }
+    .rowBox:hover {
+        background-color:rgb(246, 177, 184); 
+    }
+</style>
+
+<div style="text-align: center; margin-bottom: 30px; margin-top: 30px;">
     <h1 style="font-family: 'Arial', sans-serif; font-size: 2.5rem; color: #343a40; font-weight: bold;">Pending Oasis Forms</h1>
     <p style="font-family: 'Arial', sans-serif; font-size: 1.2rem; color: #6c757d;">You can fill the pending information here.</p>
     
@@ -25,7 +50,7 @@
         {% if row.name == '' or row.name == NULL or row.mrn == '' or row.mrn == NULL or row.pat_demo == '' or row.pat_demo == NULL or row.cli_rec == '' or row.cli_rec == NULL or row.bims == '' or row.bims == NULL or row.cams == '' or row.cams == NULL or row.phq == '' or row.phq == NULL or row.phy_ass == '' or row.phy_ass == NULL or row.rom == '' or row.rom == NULL or row.spc_tre == '' or row.spc_tre == NULL or row.ser_req == '' or row.ser_req == NULL or row.cli_sum == '' or row.cli_sum == NULL or row.med_sup == '' or row.med_sup == NULL or row.goal == '' or row.goal == NULL or row.GG0130A == '' or row.GG0130A == NULL or row.GG0130B == '' or row.GG0130B == NULL or row.GG0130C == '' or row.GG0130C == NULL or row.GG0130E == '' or row.GG0130E == NULL or row.GG0130F == '' or row.GG0130F == NULL or row.GG0130G == '' or row.GG0130G == NULL or row.GG0130H == '' or row.GG0130H == NULL or row.GG0170AB == '' or row.GG0170AB == NULL or row.GG0170C == '' or row.GG0170C == NULL or row.GG0170D == '' or row.GG0170D == NULL or row.GG0170E == '' or row.GG0170E == NULL or row.GG170F == '' or row.GG170F == NULL or row.GG170I == '' or row.GG170I == NULL or row.GG170J == '' or row.GG170J == NULL or row.GG170K == '' or row.GG170K == NULL or row.GG170L == '' or row.GG170L == NULL or row.GG170M == '' or row.GG170M == NULL or row.GG170N == '' or row.GG170N == NULL or row.GG170O == '' or row.GG170O == NULL or row.GG170P == '' or row.GG170P == NULL or row.GG170Q == '' or row.GG170Q == NULL or row.GG170R == '' or row.GG170R == NULL or row.assisted_device == '' or row.assisted_device == NULL or row.time_in == '' or row.time_in == NULL or row.time_out == '' or row.time_out == NULL or row.cli_name == '' or row.cli_name == NULL or row.visit_date == '' or row.visit_date == NULL %}
             {% if row.id %}
                 <a href="{% url 'edit_oasis_info' row.id %}" style="text-decoration: none; width: 100%; max-width: 600px;" class="rowBox">
-                    <div style="border: 2px solid #dc3545; background-color: #f8d7da; padding: 25px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; margin-left: auto; margin-right: auto;">
+                    <div style="">
                         <p style="font-family: 'Arial', sans-serif; font-size: 1.2rem; color: #343a40; margin: 5px 0;"><strong>Name:</strong> 
                             {% if row.name == '' or row.name == NULL %}
                                 <span style="color: #adb5bd;">Not provided</span>

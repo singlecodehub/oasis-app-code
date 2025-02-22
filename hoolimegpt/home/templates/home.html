@@ -19,10 +19,11 @@
     /* Body Styling */
     body {
         font-family: 'Arial', sans-serif;
-        background-color: #f4f7fc;
+        background-color:rgb(255, 255, 255);
         color: #333;
         margin: 0;
-        padding: 0;
+        padding-bottom: 80px; /* Ensure content doesn't get hidden behind fixed buttons */
+
     }
 
     h1 {
@@ -40,11 +41,10 @@
     /* Container for form and navigation */
     .form-container {
         max-width: 1000px;
-        margin: 30px auto;
+        margin: 10px auto;
         padding: 20px;
-        background-color: #fff;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        
     }
 
     /* Styling for the sections */
@@ -59,10 +59,11 @@
     .form-section {
         width: 100%;
         max-width: 800px;
-        background-color: #f9f9f9;
+        background-image: linear-gradient(to right, rgb(210, 238, 250), rgb(221, 236, 250));
         border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 40px 20px;
+        margin: 10px;
+        box-shadow: 0 0 4px 1px rgba(29, 29, 29, 0.3);
         display: none; /* Initially hide all sections */
     }
 
@@ -72,7 +73,9 @@
 
     .form-section h2 {
         color: #333;
-        margin-bottom: 20px;
+        padding: 20px;
+        text-align: center;
+        border-radius: 12px;
     }
 
     /* Styling for inputs and buttons */
@@ -104,56 +107,46 @@
     }
 
     /* Fixing the buttons at the bottom of the screen */
-    .navigation-buttons {
+    .navigation-buttons-container {
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        background-color: white; /* Optional: Background color for visibility */
-        padding: 10px 10px;
         display: flex;
-        justify-content: space-between;
-        z-index: 1; /* Ensures buttons appear above other content */
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Optional: Shadow effect */
+        justify-content: center;
+        z-index: 1000; /* Ensures buttons appear above other content */
+    }
+    .navigation-buttons {
+        width: max-content;
+        padding: 10px 20px;  
+        background-color:rgb(46, 46, 46);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        display: flex;
     }
 
     .navigation-buttons button {
-        flex-grow: 1; /* Make buttons flexible */
         margin: 0 5px; /* Add some margin for spacing */
-        min-width: 100px; /* Ensure a minimum button width */
+        min-width: 130px; /* Ensure a minimum button width */
         padding: 6px
-    }
-
-    .tui-image-editor-container {
-        position: absolute;
-        top: 80px;
-        left: 0;
-        display: none;
-        height: 100%;
-        width: 100%;
-        z-index: 99;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-    .tui-image-editor-wrapper, #tui-image-editor {
-        width: 700px;
-        height: 500px;
     }
 
     /* Responsive design for smaller screens */
     @media (max-width: 600px) {
-        
+        .navigation-buttons {
+            justify-content: space-between; /* Adjust alignment for smaller screens */
+        }
+
+        .navigation-buttons button {
+            width: 50px; /* Limit the button width on small screens */
+            margin: 3px;
+        }
     }
 
     
 </style>
 
 
-<!-- TUI Image editor -->
-<div class="tui-image-editor-container">
-    <div class="tui-image-editor-wrapper">
-        <div id="tui-image-editor"></div>
-    </div>
-</div>
 
 <h1>Welcome to OASIS Form Page</h1>
 <p class="text-center">Plesae fill the missing Informations.</p>
@@ -1089,10 +1082,12 @@
         {% endif %}
     </div>
     
-    <div class="navigation-buttons">
-        <button type="button" onclick="previousSection()">Previous</button>
-        <button type="submit" onclick="showSaveMessage()" class="btn btn-success">Save</button>
-        <button type="button" onclick="nextSection()">Next</button>
+    <div class="navigation-buttons-container">
+        <div class="navigation-buttons">
+            <button type="button" onclick="previousSection()">Previous</button>
+            <button type="submit" onclick="showSaveMessage()" class="btn btn-success">Save</button>
+            <button type="button" onclick="nextSection()">Next</button>
+        </div>
     </div>
 </div>
 

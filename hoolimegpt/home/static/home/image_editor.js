@@ -1,3 +1,7 @@
+
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 600;
+
 const $ = (id) => {
     return document.getElementById(id);
 }
@@ -5,12 +9,19 @@ const $ = (id) => {
 const colorEl = $("color-select");
 const strokeEidth = $('stroke-width');
 const imageInput = document.getElementById("imageInput");
-const shapeSelector = document.getElementById("shapeSelector");
 const canvasWrapper = document.getElementById("canvas-wrapper");
-const canvas = new fabric.Canvas(document.getElementById("canvas"), {
-    isDrawingMode: true,
-});
-canvas.freeDrawingBrush = new fabric.PencilBrush(canvas)
+const canvasContainer = document.getElementById("canvas-container");
+
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+let isDrawing = false;
+let canDraw = true;
+let lastX = 0, lastY = 0;
+
+// image size
+let imgWidth = null;
+let imgHeight = null;
+
 let canvasJsonState = []; 
 let canvasInitialState = []
 
@@ -25,14 +36,10 @@ function setFileName() {
 }
 
 colorEl.onchange = (e) => {
-    canvas.freeDrawingBrush.color = e.target.value;
-}
-strokeEidth.onchange = (e) => {
-    canvas.freeDrawingBrush.width = e.target.value;
+    ctx.strokeStyle = e.target.value;
 }
 
 let overLay = false;
-let isDrawing = false;
 let shape = null;  // The current shape being drawn
 
 
@@ -44,6 +51,7 @@ const openOverlay = () => {
 // close overlay
 const closeOverlay = () => {
     overLay = false;
+    currentInput.value = "";
     canvasWrapper.style.display = "none";
 
     currentImageId = null;
@@ -90,7 +98,27 @@ function changeInput(file) {
 
 // Save the edited image
 function saveImage() {
-    const dataURL = canvas.toDataURL("image/png");
+    console.log(imgWidth, imgHeight)
+
+    // Calculate scaling and positioning (already applied in your draw logic)
+    const scale = Math.min(CANVAS_WIDTH / imgWidth, CANVAS_HEIGHT / imgHeight);
+    const scaledWidth = imgWidth * scale;
+    const scaledHeight = imgHeight * scale;
+    const offsetX = (CANVAS_WIDTH - scaledWidth) / 2;
+    const offsetY = (CANVAS_HEIGHT - scaledHeight) / 2;
+
+    // Create a new temporary canvas for cropping
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = scaledWidth;
+    tempCanvas.height = scaledHeight;
+
+    let tempCtx = tempCanvas.getContext("2d");
+
+    // Copy only the image part
+    tempCtx.drawImage(canvas, offsetX, offsetY, scaledWidth, scaledHeight, 0, 0, scaledWidth, scaledHeight);
+
+    // Convert to data URL (or you can save it as a file)
+    const dataURL = tempCanvas.toDataURL("image/png");
 
     // set name of the new file
     setFileName();
@@ -107,34 +135,68 @@ function saveImage() {
 
             alert("Image with highlights saved!");
         });
-    canvas.renderAll();
 }
 
 
 
-// Clear and undo canvas
-const clearCanvas = () => {
-    canvas.loadFromJSON(canvasInitialState[0]);
+
+
+
+// Start drawing
+function startDrawing(e) {
+    if (!canDraw) return; // Allow scrolling when drawing is disabled
+    if (e.touches && e.touches.length > 1) return; // Ignore multi-touch for scrolling
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    [lastX, lastY] = [
+        (e.offsetX || e.touches[0].clientX - rect.left),
+        (e.offsetY || e.touches[0].clientY - rect.top)
+    ];
+    e.preventDefault(); // Prevent unwanted page scroll when drawing
 }
 
-const undoCanvas = () => {
-    if (canvasJsonState.length === 0) {
-        return
-    }
-    const lastState = canvasJsonState.pop();
-    canvas.loadFromJSON(lastState);
+// Draw function
+function draw(e) {
+    if (!isDrawing || !canDraw) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.offsetX || e.touches[0].clientX - rect.left;
+    const y = e.offsetY || e.touches[0].clientY - rect.top;
+
+    ctx.strokeStyle = colorEl.value;
+    ctx.lineWidth = 10;
+    ctx.lineCap = "round";
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+
+    e.preventDefault(); // Prevent unwanted page scrolling when drawing
 }
 
-canvas.on("mouse:down", (event) => {
-    if (canvasInitialState.length === 0)
-        canvasInitialState.push(canvas.toJSON());
-    canvasJsonState.push(canvas.toJSON());
-}) 
-
-
+function stopDrawing() {
+    isDrawing = false;
+}
 
 function editImage() {
-    canvas.isDrawingMode = !canvas.isDrawingMode;
-    console.log(canvas.isDrawingMode);
+    canDraw = !canDraw
+    canvasContainer.style.touchAction = canDraw ? "none" : "auto";
+
+    if (canDraw) {
+        alert("Edit enabled");
+    } else {
+        alert("Edit disabled");
+    }
 }
+
+
+// Attach events for mouse & touch
+canvas.addEventListener("mousedown", startDrawing);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stopDrawing);
+canvas.addEventListener("mouseleave", stopDrawing);
+canvas.addEventListener("touchstart", startDrawing, { passive: false });
+canvas.addEventListener("touchmove", draw, { passive: false });
+canvas.addEventListener("touchend", stopDrawing);
 

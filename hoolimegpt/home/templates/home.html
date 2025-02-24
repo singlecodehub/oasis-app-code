@@ -4,13 +4,6 @@
 {% block title %}Home{% endblock %}
 
 {% block css %}
-    <link
-    rel="stylesheet"
-    href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.css"
-    />
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-    
 {% endblock %}
 
 
@@ -527,26 +520,40 @@
                                     if (file) {
                                         const reader = new FileReader();
                                         reader.onload = function (e) {
-
-                                        currentReaderOnLoadEvent = e;
-                                            /*
-                                            const imgElement = document.getElementById(imgId);
-                                            imgElement.src = e.target.result;
-                                            imgElement.style.display = 'block';
-                                            document.getElementById(addMoreBtnId).style.display = 'block';
-                                            */
-                                            fabric.Image.fromURL(e.target.result, function(img) {
-                                                canvas.clear();
-                                                img.set({ 
-                                                    selectable: false,
-                                                    top: 0,
-                                                }); // Make the image non-selectable
-                                                canvas.setWidth(img.width);
-                                                canvas.setHeight(img.height);
+                                            const img = new Image();
+                                            img.onload = function() {
+                                                // Clear canvas
+                                                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                                     
-                                                canvas.add(img);
-                                                canvas.renderAll();
-                                            });
+                                                // Get aspect ratio fit
+                                                const imgRatio = img.width / img.height;
+                                                const canvasRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+                                                
+                                                let drawWidth, drawHeight;
+                                                if (imgRatio > canvasRatio) {
+                                                    // Image is wider than canvas
+                                                    drawWidth = CANVAS_WIDTH;
+                                                    drawHeight = CANVAS_WIDTH / imgRatio;
+                                                } else {
+                                                    // Image is taller than canvas
+                                                    drawHeight = CANVAS_HEIGHT;
+                                                    drawWidth = CANVAS_HEIGHT * imgRatio;
+                                                }
+
+
+                                                imgWidth = drawWidth;
+                                                imgHeight = drawHeight;
+
+                                                // Center the image in the canvas
+                                                const offsetX = (CANVAS_WIDTH - drawWidth) / 2;
+                                                const offsetY = (CANVAS_HEIGHT - drawHeight) / 2;
+
+                                                ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+                                            }
+                                            
+
+                                            currentReaderOnLoadEvent = e;
+                                            img.src = e.target.result;
                                         }
                                         reader.readAsDataURL(file);
 
@@ -1346,45 +1353,5 @@
 {% endblock %}
 
 {% block js %}
-
-<script>
-        // Edit image 
-    function editImage(imageId) {
-        const imageEditor = new tui.ImageEditor('#tui-image-editor', {
-            includeUI: {
-                menu: ['crop', 'flip', 'rotate', 'draw', 'filter', "draw", 'text'],
-                initMenu: 'draw',
-                uiSize: {
-                width: '100%',
-                height: '700px'
-                }
-            },
-            cssMaxWidth: 700,
-            cssMaxHeight: 500,
-            selectionStyle: {
-                cornerSize: 50,
-                rotatingPointOffset: 100,
-            },
-        });
-    
-        const imageEditorContainer = document.querySelector(".tui-image-editor-container");
-        const tuiImageEditor = document.querySelector("#tui-image-editor");
-        const imageContainer = document.getElementById('image_' + imageId);
-        const imgSrc = imageContainer.children[0].getAttribute("src");
-
-        // Activate the container and element
-        imageEditorContainer.style.display = "block";
-        tuiImageEditor.style.display = "block";
-        imageEditor.loadImageFromURL(imgSrc, 'DisplayedImage')
-        .then(() => {
-            console.log('Image loaded into editor');
-            imageEditor.clearUndoStack();
-        })
-        .catch(err => {
-            console.error('Error loading image:', err);
-        });
-    }
-
-</script>
 
 {% endblock %}

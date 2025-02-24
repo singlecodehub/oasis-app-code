@@ -49,13 +49,13 @@
 @media screen and (max-width: 1280px) {
     #canvas-inner > div {
         width: 700px;
-        height: 600px;
+        height: 500px;
     }
 }
 @media screen and (max-width: 650px) {
     #canvas-inner > div {
         width: 400px;
-        height: 600px;
+        height: 500px;
     }
 }
 @media screen and (max-width: 400px) {

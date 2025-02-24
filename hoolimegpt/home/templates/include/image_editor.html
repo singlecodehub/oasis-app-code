@@ -1,22 +1,20 @@
 <div id="canvas-wrapper">
+  <div class="p-2" id="canvas-navbar">
+    <div class="">
+      <input class="me-2 d-inline-block" type="color" id="color-select" />
+      <button type="button" class="d-inline-block btn btn-sm btn-primary" onclick="editImage()">Edit</button>
+    </div>
+    <div class="">
+      <button type="button" class="mx-1 d-inline-block btn btn-success btn-sm" onclick="saveImage()"><i class="bi bi-floppy-fill"></i></button>
+      <button type="button" class="mx-1 d-inline-block btn btn-secondary btn-sm" onclick="downloadImage()"><i class="bi bi-download"></i></button>
+      <button type="button" class="mx-1 d-inline-block btn btn-danger btn-sm" onclick="closeOverlay()"><i class="bi bi-x-octagon-fill"></i></button>
+    </div>
+  </div>
+
   <div id="canvas-inner">
     <div id="">
-      <div class="" id="canvas-navbar">
-        <div class="d-flex justify-content-end">
-          <button type="button" class="mx-1 btn btn-success btn-sm" onclick="saveImage()"><i class="bi bi-floppy-fill"></i></button>
-          <button type="button" class="mx-1 btn btn-secondary btn-sm" onclick="downloadImage()"><i class="bi bi-download"></i></button>
-          <button type="button" class="mx-1 btn btn-danger btn-sm" onclick="closeOverlay()"><i class="bi bi-x-octagon-fill"></i></button>
-        </div>
-        <div class="my-3">
-          <input class="me-2 d-inline-block" type="color" id="color-select" />
-          <input class="me-2 d-inline-block" type="range" value="1" min="1" max="10" id="stroke-width" />
-          <button type="button" class="me-2 d-inline-block btn btn-sm btn-danger" onclick="undoCanvas()"><i class="bi bi-arrow-counterclockwise"></i></button>
-          <button type="button" class="me-2 d-inline-block btn btn-sm btn-danger" onclick="clearCanvas()"><i class="bi bi-trash3"></i></button>
-          <button type="button" class="me-2 d-inline-block btn btn-sm btn-primary" onclick="editImage()">Edit</button>
-        </div>
-      </div>
       <div id="canvas-container">
-        <canvas id="canvas"></canvas>
+        <canvas id="drawingCanvas" width="800" height="600" id="canvas"></canvas>
       </div>
     </div>
   </div>

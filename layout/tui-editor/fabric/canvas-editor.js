@@ -14,10 +14,14 @@ const canvasContainer = document.getElementById("canvas-container");
 const canvas = document.getElementById("drawingCanvas");
 const ctx = canvas.getContext("2d");
 let isDrawing = false;
-let canDraw = false;
+let canDraw = true;
 let lastX = 0, lastY = 0;
 
-let canvasJsonState = []; 
+// image size
+let imgWidth = null;
+let imgHeight = null;
+
+let canvasJsonState = [];
 let canvasInitialState = []
 
 let newFileName = null;
@@ -45,17 +49,18 @@ const closeOverlay = () => {
     overLay = false;
     imageInput.value = "";
     canvasWrapper.style.display = "none";
+
 }
 
 // Handle file input change
-imageInput.addEventListener("change", function(event) {
+imageInput.addEventListener("change", function (event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
             // Clear canvas
             ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -77,6 +82,9 @@ imageInput.addEventListener("change", function(event) {
             // Center the image in the canvas
             const offsetX = (CANVAS_WIDTH - drawWidth) / 2;
             const offsetY = (CANVAS_HEIGHT - drawHeight) / 2;
+
+            imgWidth = drawWidth;
+            imgHeight = drawHeight;
 
             ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
         };
@@ -114,17 +122,37 @@ function changeInput(file) {
     const imgUrl = URL.createObjectURL(file);
 
     let fileName = newFileName
-    let fileObject = new File([file], fileName,{type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
-    let container = new DataTransfer(); 
+    let fileObject = new File([file], fileName, { type: "image/jpeg", lastModified: new Date().getTime() }, 'utf-8');
+    let container = new DataTransfer();
     container.items.add(fileObject);
     imageInput.files = container.files;
 }
 
 // Save the edited image
 function saveImage() {
-    // canvas.renderAll();
+    console.log(imgWidth, imgHeight)
 
-    const dataURL = canvas.toDataURL("image/png");
+    // Calculate scaling and positioning (already applied in your draw logic)
+    const scale = Math.min(CANVAS_WIDTH / imgWidth, CANVAS_HEIGHT / imgHeight);
+    const scaledWidth = imgWidth * scale;
+    const scaledHeight = imgHeight * scale;
+    const offsetX = (CANVAS_WIDTH - scaledWidth) / 2;
+    const offsetY = (CANVAS_HEIGHT - scaledHeight) / 2;
+
+    // Create a new temporary canvas for cropping
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = scaledWidth;
+    tempCanvas.height = scaledHeight;
+
+    let tempCtx = tempCanvas.getContext("2d");
+
+    // Copy only the image part
+    tempCtx.drawImage(canvas, offsetX, offsetY, scaledWidth, scaledHeight, 0, 0, scaledWidth, scaledHeight);
+
+    // Convert to data URL (or you can save it as a file)
+    const dataURL = tempCanvas.toDataURL("image/png");
+
+    // const dataURL = canvas.toDataURL("image/png");
 
     // set name of the new file
     setFileName(imageInput);
@@ -156,8 +184,8 @@ const undoCanvas = () => {
     canvas.loadFromJSON(lastState);
 }
 
- // Start drawing
- function startDrawing(e) {
+// Start drawing
+function startDrawing(e) {
     if (!canDraw) return; // Allow scrolling when drawing is disabled
     if (e.touches && e.touches.length > 1) return; // Ignore multi-touch for scrolling
     isDrawing = true;
@@ -196,6 +224,12 @@ function stopDrawing() {
 function editImage() {
     canDraw = !canDraw
     canvasContainer.style.touchAction = canDraw ? "none" : "auto";
+
+    if (canDraw) {
+        alert("Edit enabled");
+    } else {
+        alert("Edit disabled");
+    }
 }
 
 

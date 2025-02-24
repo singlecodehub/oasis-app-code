@@ -557,26 +557,40 @@
                         if (file) {
                             const reader = new FileReader();
                             reader.onload = function (e) {
-
-                            currentReaderOnLoadEvent = e;
-                                /*
-                                const imgElement = document.getElementById(imgId);
-                                imgElement.src = e.target.result;
-                                imgElement.style.display = 'block';
-                                document.getElementById(addMoreBtnId).style.display = 'block';
-                                */
-                                fabric.Image.fromURL(e.target.result, function(img) {
-                                    canvas.clear();
-                                    img.set({ 
-                                        selectable: false,
-                                        top: 0,
-                                    }); // Make the image non-selectable
-                                    canvas.setWidth(img.width);
-                                    canvas.setHeight(img.height);
+                                const img = new Image();
+                                img.onload = function() {
+                                    // Clear canvas
+                                    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                         
-                                    canvas.add(img);
-                                    canvas.renderAll();
-                                });
+                                    // Get aspect ratio fit
+                                    const imgRatio = img.width / img.height;
+                                    const canvasRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+                                    
+                                    let drawWidth, drawHeight;
+                                    if (imgRatio > canvasRatio) {
+                                        // Image is wider than canvas
+                                        drawWidth = CANVAS_WIDTH;
+                                        drawHeight = CANVAS_WIDTH / imgRatio;
+                                    } else {
+                                        // Image is taller than canvas
+                                        drawHeight = CANVAS_HEIGHT;
+                                        drawWidth = CANVAS_HEIGHT * imgRatio;
+                                    }
+
+                                    // Center the image in the canvas
+                                    const offsetX = (CANVAS_WIDTH - drawWidth) / 2;
+                                    const offsetY = (CANVAS_HEIGHT - drawHeight) / 2;
+
+                                    
+                                    imgWidth = drawWidth;
+                                    imgHeight = drawHeight;
+
+                                    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+                                }
+                                
+
+                                currentReaderOnLoadEvent = e;
+                                img.src = e.target.result;
                             }
                             reader.readAsDataURL(file);
 
@@ -600,7 +614,7 @@
                         for (let i = 1; i <= 15; i++) {
                             document.write(`
                                 <div id="section${i}" style="display: ${i === 1 ? 'grid' : 'none'}; grid-template-columns: 1fr 2fr; align-items: center; gap: 20px; margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #ddd;">
-                                    <input type="file" id="file${i}" name="images[]" accept="image/*" capture="environment" style="display:none;" onchange="previewImage(this, 'img${i}', 'btn${i}')">
+                                    <input type="file" id="file${i}" name="images[]" accept="image/*" style="display:none;" onchange="previewImage(this, 'img${i}', 'btn${i}')">
                                     <span style="font-size: 40px; cursor: pointer;" onclick="captureImage('file${i}')">📷</span>
                                     <img id="img${i}" onclick="window.open(this.src, '_blank')" style="width: 100%; max-width: 150px; border-radius: 10px; cursor: pointer; display: none;">
                                     <div>

@@ -1,16 +1,22 @@
+
+const MAX_WIDTH = 800;
+const MAX_HEIGHT = 600;
+
 const $ = (id) => {
     return document.getElementById(id);
 }
 
 const colorEl = $("color-select");
-const strokeEidth = $('stroke-width');
 const imageInput = document.getElementById("imageInput");
 const shapeSelector = document.getElementById("shapeSelector");
 const canvasWrapper = document.getElementById("canvas-wrapper");
-const canvas = new fabric.Canvas(document.getElementById("canvas"), {
+const canvas = new fabric.Canvas("drawingCanvas", {
     isDrawingMode: true,
 });
+canvas.selection = false;
 canvas.freeDrawingBrush = new fabric.PencilBrush(canvas)
+canvas.freeDrawingBrush.width = "10";
+
 let canvasJsonState = []; 
 let canvasInitialState = []
 
@@ -26,9 +32,6 @@ document.getElementById("uploadImage").addEventListener("click", () => {
 
 colorEl.onchange = (e) => {
     canvas.freeDrawingBrush.color = e.target.value;
-}
-strokeEidth.onchange = (e) => {
-    canvas.freeDrawingBrush.width = e.target.value;
 }
 
 let overLay = false;
@@ -55,15 +58,19 @@ imageInput.addEventListener("change", function(event) {
     reader.onload = function(e) {
         fabric.Image.fromURL(e.target.result, function(img) {
             canvas.clear();
-            img.set({ 
+            const scale = Math.min(MAX_WIDTH / img.width, MAX_HEIGHT / img.height);
+                    
+            img.set({
+                scaleX: scale,
+                scaleY: scale,
                 selectable: false,
-                top: 0,
+                evented: false,
             }); // Make the image non-selectable
-            canvas.setWidth(img.width);
-            canvas.setHeight(img.height);
+            // canvas.setWidth(img.width);
+            // canvas.setHeight(img.height);
 
             canvas.add(img);
-            canvas.renderAll();
+            canvas.sendToBack(img);
         });
     };
     reader.readAsDataURL(file);
@@ -146,4 +153,22 @@ canvas.on("mouse:down", (event) => {
     canvasJsonState.push(canvas.toJSON());
 }) 
 
+// canvas.setZoom();
 
+
+function editImage() {
+    canvas.isDrawingMode = !canvas.isDrawingMode;
+    if (canvas.isDrawingMode) {
+        canvas.forEachObject(function (obj) {
+            console.log("unlock canvas")
+            obj.selectable = true; // Prevent objects from being selected
+            obj.evented = false; // Disable interactions (drag, rotate, scale)
+        });
+    } else {
+        canvas.forEachObject(function (obj) {
+            console.log("lock canvas")
+            obj.selectable = true; // Prevent objects from being selected
+            obj.evented = false; // Disable interactions (drag, rotate, scale)
+        });
+    }
+}

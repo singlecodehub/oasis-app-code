@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas with Scroll & Drawing Toggle</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        #canvas-container {
+            width: 800px;
+            height: 600px;
+            border: 1px solid #ccc;
+            overflow: auto; /* Enables scrolling */
+            display: inline-block;
+            background: #f5f5f5;
+            touch-action: auto; /* Enables scroll when drawing is disabled */
+        }
+        canvas {
+            cursor: crosshair;
+            background: white;
+        }
+        .active { background: green; color: white; }
+        .inactive { background: red; color: white; }
+    </style>
+</head>
+<body>
+    <h2>Canvas with Scroll & Drawing Toggle</h2>
+
+    <input type="file" id="imageLoader" accept="image/*">
+    <input type="color" id="colorPicker" value="#000000">
+    <button onclick="clearCanvas()">Clear</button>
+    <button id="toggleDrawBtn" class="inactive" onclick="toggleDrawing()">Enable Drawing</button>
+
+    <div id="canvas-container">
+        <canvas id="drawingCanvas" width="800" height="600"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("drawingCanvas");
+        const ctx = canvas.getContext("2d");
+        const colorPicker = document.getElementById("colorPicker");
+        const imageLoader = document.getElementById("imageLoader");
+        const toggleDrawBtn = document.getElementById("toggleDrawBtn");
+        const canvasContainer = document.getElementById("canvas-container");
+
+        let isDrawing = false;
+        let canDraw = false; // Drawing disabled by default
+        let lastX = 0, lastY = 0;
+
+        const CANVAS_WIDTH = 800;
+        const CANVAS_HEIGHT = 600;
+
+        function toggleDrawing() {
+            canDraw = !canDraw;
+            toggleDrawBtn.textContent = canDraw ? "Disable Drawing" : "Enable Drawing";
+            toggleDrawBtn.classList.toggle("active", canDraw);
+            toggleDrawBtn.classList.toggle("inactive", !canDraw);
+
+            // Enable scrolling when drawing is disabled
+            canvasContainer.style.touchAction = canDraw ? "none" : "auto";
+        }
+
+        function startDrawing(e) {
+            if (!canDraw) return; // Allow scrolling when drawing is disabled
+            if (e.touches && e.touches.length > 1) return; // Ignore multi-touch for scrolling
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            [lastX, lastY] = [
+                (e.offsetX || e.touches[0].clientX - rect.left),
+                (e.offsetY || e.touches[0].clientY - rect.top)
+            ];
+            e.preventDefault(); // Prevent unwanted page scroll when drawing
+        }
+
+        function draw(e) {
+            if (!isDrawing || !canDraw) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.offsetX || e.touches[0].clientX - rect.left;
+            const y = e.offsetY || e.touches[0].clientY - rect.top;
+
+            ctx.strokeStyle = colorPicker.value;
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            [lastX, lastY] = [x, y];
+
+            e.preventDefault(); // Prevent unwanted page scrolling when drawing
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // Attach events for mouse & touch
+        canvas.addEventListener("mousedown", startDrawing);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", stopDrawing);
+        canvas.addEventListener("mouseleave", stopDrawing);
+        canvas.addEventListener("touchstart", startDrawing, { passive: false });
+        canvas.addEventListener("touchmove", draw, { passive: false });
+        canvas.addEventListener("touchend", stopDrawing);
+
+        imageLoader.addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+                        const imgRatio = img.width / img.height;
+                        const canvasRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+
+                        let drawWidth, drawHeight;
+                        if (imgRatio > canvasRatio) {
+                            drawWidth = CANVAS_WIDTH;
+                            drawHeight = CANVAS_WIDTH / imgRatio;
+                        } else {
+                            drawHeight = CANVAS_HEIGHT;
+                            drawWidth = CANVAS_HEIGHT * imgRatio;
+                        }
+
+                        const offsetX = (CANVAS_WIDTH - drawWidth) / 2;
+                        const offsetY = (CANVAS_HEIGHT - drawHeight) / 2;
+
+                        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+    </script>
+</body>
+</html>

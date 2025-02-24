@@ -10,8 +10,6 @@ from django.http import JsonResponse
 from datetime import datetime
 import json
 
-# from . import transcription
-
 
 @login_required
 # def home(request, id=None):
@@ -568,3 +566,4 @@ def extract(request):
 #         result = transcription.transcribe_audio("/home/paradox/Downloads/harvard.wav")
 #         return JsonResponse({"success": True, "result": result['text']})
 #     return JsonResponse({"success": False})
+

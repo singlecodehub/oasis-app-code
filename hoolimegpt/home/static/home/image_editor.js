@@ -130,3 +130,11 @@ canvas.on("mouse:down", (event) => {
         canvasInitialState.push(canvas.toJSON());
     canvasJsonState.push(canvas.toJSON());
 }) 
+
+
+
+function editImage() {
+    canvas.isDrawingMode = !canvas.isDrawingMode;
+    console.log(canvas.isDrawingMode);
+}
+

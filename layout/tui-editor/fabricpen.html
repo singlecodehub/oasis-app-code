@@ -26,15 +26,13 @@
                     </div>
                     <div class="my-3">
                         <input class="me-2 d-inline-block" type="color" id="color-select">
-                        <input class="me-2 d-inline-block" type="range" value="1" min="1" max="10" id="stroke-width">
                         <button type="button" class="me-2 d-inline-block btn btn-sm btn-danger" onclick="undoCanvas()"><i class="bi bi-arrow-counterclockwise"></i></i></button>
                         <button type="button" class="me-2 d-inline-block btn btn-sm btn-danger" onclick="clearCanvas()"><i class="bi bi-trash3"></i></button>
+                        <button type="button" class="me-2 d-inline-block btn btn-sm btn-primary" onclick="editImage()">Edit</button>
                     </div>
                     
                 </div>
-                <div id="canvas-container">
-                    <canvas id="canvas"></canvas>
-                </div>
+                <canvas id="drawingCanvas" width="800" height="600" id="canvas"></canvas>
             </div>
         </div>
     </div>

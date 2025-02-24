@@ -54,6 +54,7 @@ urlpatterns = [
     # path("transcription/", transcription_view, name="transcription")
 
 
+
     # path('send-otp/', send_otp, name='send_otp'),
     # path('verify-otp/', verify_otp, name='verify_otp'),
     # path('reset-password/', reset_password, name='reset_password'),

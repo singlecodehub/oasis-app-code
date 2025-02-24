@@ -37,7 +37,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
     '192.168.68.74',
-    "192.168.0.181",
+    "192.168.1.10",
     'app.hoolime.care',  # Add your custom domain
     'hoolimegpt-780006979537.us-east4.run.app'  # Include your Cloud Run domain
 ]

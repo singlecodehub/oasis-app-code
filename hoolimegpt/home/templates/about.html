@@ -6,7 +6,6 @@
 
 {% block css %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 {% endblock css %}
 
 {% block content %}
@@ -557,26 +556,36 @@
                         if (file) {
                             const reader = new FileReader();
                             reader.onload = function (e) {
+                                currentReaderOnLoadEvent = e;
+                                const img = new Image();
+                                img.onload = () => {
+                                    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                                    // Get aspect ratio fit
+                                    const imgRatio = img.width / img.height;
+                                    const canvasRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
 
-                            currentReaderOnLoadEvent = e;
-                                /*
-                                const imgElement = document.getElementById(imgId);
-                                imgElement.src = e.target.result;
-                                imgElement.style.display = 'block';
-                                document.getElementById(addMoreBtnId).style.display = 'block';
-                                */
-                                fabric.Image.fromURL(e.target.result, function(img) {
-                                    canvas.clear();
-                                    img.set({ 
-                                        selectable: false,
-                                        top: 0,
-                                    }); // Make the image non-selectable
-                                    canvas.setWidth(img.width);
-                                    canvas.setHeight(img.height);
-                        
-                                    canvas.add(img);
-                                    canvas.renderAll();
-                                });
+                                    let drawWidth, drawHeight;
+                                    if (imgRatio > canvasRatio) {
+                                        // Image is wider than canvas
+                                        drawWidth = CANVAS_WIDTH;
+                                        drawHeight = CANVAS_WIDTH / imgRatio;
+                                    } else {
+                                        // Image is taller that than canvas
+                                        drawHeight = CANVAS_HEIGHT;
+                                        drawWidth = CANVAS_HEIGHT * imgRatio;
+                                    }
+
+                                    // Center the image in the canvas
+                                    const offsetX  = (CANVAS_WIDTH - drawWidth) / 2;
+                                    const offsetY = (CANVAS_HEIGHT - drawHeight) / 2;
+
+                                    imgWidth = drawWidth;
+                                    imgHeight = drawHeight;
+
+                                    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+                                }
+                                img.src = e.target.result;
+                                
                             }
                             reader.readAsDataURL(file);
 

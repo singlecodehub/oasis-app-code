@@ -1,14 +1,23 @@
+from datetime import datetime
+import io
+import json
+import os
+import subprocess
+
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-from .forms import UserInfoForm, ImageForm
-from .models import OasisInfo, Image, Mandatory_Documents
 from django.shortcuts import render
 from django.contrib.auth import logout
 from django.http import JsonResponse
-from datetime import datetime
-import json
+from pydub import AudioSegment
+from google.cloud import speech
+import wave
+
+from .forms import UserInfoForm, ImageForm
+from .models import OasisInfo, Image, Mandatory_Documents
 
 
 @login_required
@@ -558,6 +567,97 @@ def extract(request):
         {}
     )
 
+
+
+def get_audio_properties(file_path):
+    """Check sample rate and number of channels of an audio file."""
+    with wave.open(file_path, "rb") as audio:
+        sample_rate = audio.getframerate()
+        channels = audio.getnchannels()
+    return sample_rate, channels
+
+def convert_audio(input_file, output_file="converted_audio.wav"):
+    """Convert audio to mono, 16kHz, LINEAR16 format using FFmpeg."""
+    try:
+        command = [
+            "ffmpeg", "-y", "-i", input_file,  # Input file
+            "-ac", "1",  # Convert to mono
+            "-ar", "16000",  # Resample to 16 kHz
+            "-c:a", "pcm_s16le",  # LINEAR16 encoding
+            output_file  # Output file
+        ]
+        subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return output_file
+    except subprocess.CalledProcessError as e:
+        print("FFmpeg conversion failed:", e)
+        return None
+
+def transcribe_audio(file_path):
+    """Transcribe an audio file using Google Speech-to-Text API."""
+    client = speech.SpeechClient()
+
+    with io.open(file_path, "rb") as audio_file:
+        content = audio_file.read()
+
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000,
+        language_code="en-US"
+    )
+    audio = speech.RecognitionAudio(content=content)
+
+    response = client.recognize(config=config, audio=audio)
+
+    # Print and return transcription
+    transcript = "\n".join([result.alternatives[0].transcript for result in response.results])
+    return transcript if transcript else "No speech detected."
+
+@login_required
+@csrf_exempt
+def audio_transcribe_view(request):
+    print(request.user)
+    if request.method == "POST":
+        print(request.FILES.get("audio_file"))
+        input_audio = request.FILES.get("audio_file")
+        
+        # input_audio = f"/home/paradox/Downloads/harvard.wav"
+        try:
+            import librosa
+            import soundfile as sf
+        except ImportError:
+            return JsonResponse("Unable to import librosa and soundfile")
+        
+        # input_audio = io.BytesIO(input_audio.read())
+        file_path = os.path.join(settings.TEMP_AUDIO, input_audio.name)
+        
+        # Save file temporarily
+        with open(file_path, "wb+") as destination:
+            for chunk in input_audio.chunks():
+                destination.write(chunk)
+        
+        input_audio = file_path
+        
+        # add necessary header to upload files.
+        x,_ = librosa.load(input_audio, sr=16000)
+        sf.write(input_audio, x, 16000)
+        
+        # Step 1: Check audio properties
+        sample_rate, channels = get_audio_properties(input_audio)
+        print(f"Original Audio: {sample_rate} Hz, {channels} channels")
+
+        # Step 2: Convert if necessary
+        if sample_rate != 16000 or channels != 1:
+            print("Converting audio to mono, 16kHz...")
+            converted_audio = convert_audio(input_audio)
+        else:
+            print("Audio is already in correct format. Skipping conversion.")
+            converted_audio = input_audio
+
+        # Step 3: Transcribe the converted audio
+        print("Transcribing...")
+        transcript = transcribe_audio(converted_audio)
+        return JsonResponse({"message": transcript})
+    return JsonResponse({"message": ""})
 
 # @login_required
 # @csrf_exempt

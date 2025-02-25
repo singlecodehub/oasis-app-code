@@ -51,7 +51,7 @@ urlpatterns = [
 
     path("extract/", extract, name="ocr_extract"),
 
-    # path("transcription/", transcription_view, name="transcription")
+    path("transcribe/", audio_transcribe_view, name="audio_transcribe")
 
 
 

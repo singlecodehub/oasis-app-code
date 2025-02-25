@@ -5,7 +5,7 @@
 
 
 {% block css %}
-
+<link rel="stylesheet" href="{% static '/home/audio_transcribe.css' %}">
 {% endblock css %}
 
 {% block content %}
@@ -140,6 +140,27 @@
 
 
 
+<div id="record-overlay-container" class="">
+    <div class="">
+        <div id="record-overlay">
+            <div class="record-overlay-top">
+                Recording
+            </div>
+            <div class="record-overlay-bottom">
+                <button id="stop-recording" class="stop-recording btn btn-danger">
+                    Stop recording
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="loader">
+    <div></div>
+</div>
+
+
 <h1 class="">OASIS Form</h1>
 <p class="text-center">Please enter the patient's information.</p>
 
@@ -166,7 +187,12 @@
                 </div>
                 <div>
                     <label for="id_pat_demo">Patient Demographics:</label>
-                    <textarea name="pat_demo" rows="5" style="width:100%">{{ request.GET.pat_demo|default:'' }}</textarea>
+                    <div class="record-cotnainer">
+                        <div class="record-wrapper record-box">
+                            <button type="button" id="" class="record btn btn-sm btn-warning"><i class="bi bi-mic-fill"></i></button>
+                            <textarea class="record-text" id="id_pat_demo" name="pat_demo" rows="5" style="width:100%;">{{ form.pat_demo.value|default:'' }}</textarea>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label for="id_cli_name">Clinician Name:</label>
@@ -626,7 +652,90 @@
 
         </div>
 
+        <div class="form-section">
+            <h2>Med list</h2>
+            <style>
+                .image-upload, .image-viewer {
+                  width: 100%;
+                  hight: 100%;
+                  display: flex;
+                }
+                .image-upload {
+                    justify-content: end;
+                }
+
+                .image-viewer {
+                    padding: relative;
+                    justify-content: center;
+                    width: 100%;
+                    height: 300px;
+                    background: white;
+                }
                 
+                .image-text-spinner {
+                    position: absolute;
+                    height: 300px;
+                    width: 100%;
+                    background-color: rgba(29, 29, 29, 0.3);
+                    display: none;
+                }
+                .image-text-spinner-inner {
+                    height: 100%;
+                    width: 100%;
+                    display: flex;
+                    flex-flow: column;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .image-viewer > img {
+                    max-width: 100%;
+                    height: 300px;
+                }
+
+                .upload-image-text {
+                    width: 100%;
+                    height: 300px;
+                }
+                .upload-image-text {
+                    display: none;
+                }
+                .upload-image-text > textarea {
+                    width: 100%;
+                    height: 100%;
+                    resize: none;
+                }
+              </style>
+            
+              <div>
+                <div class="image-upload-container">
+                    <div class="image-upload">
+                        
+                        <input type="file" hidden id="upload-image-input">
+                        <button type="button" class="btn btn-sm btn-success m-2" type="file" name="image-upload" id="image-upload-button">
+                            Upload
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success m-2" type="file" name="image-upload" id="copy-upload-text">
+                            Copy
+                        </button>
+                    </div>
+                    <div class="image-viewer mt-3">
+                        
+                        {% comment %} <div class="image-text-spinner">
+                            <div class="image-text-spinner-inner">
+                                <div class='p-3 bg-light rounded-3'>Extracting..</div>
+                            </div>
+                        </div> {% endcomment %}
+
+                        <img src="" alt="Upload image" />
+                    </div>
+                    <div class="upload-image-text">
+                        <textarea name="" id=""  ></textarea>
+                    </div>
+                </div>
+              </div>
+              <script src="{% static 'home/upload_image.js' %}" defer></script>
+        </div>        
 
 
 
@@ -1362,3 +1471,10 @@ function previewImages(event) {
 </script>
 
 {% endblock %}
+
+
+{% block js %}
+
+<script src="{% static '/home/audio_transcribe.js' %}"></script>
+<script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+{% endblock js %}

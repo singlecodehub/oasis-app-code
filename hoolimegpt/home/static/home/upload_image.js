@@ -8,13 +8,6 @@ const copyUploadText = document.querySelector("#copy-upload-text");
 const imageTextSpinner = document.querySelector(".image-text-spinner");
 
 
-const spinnerActive = async () => {
-    imageTextSpinner.style.display = "block"
-}
-const spinnerInActive = async () => {
-    imageTextSpinner.style.display = "none"
-}
-
 const textActive = async () => {
     uploadImageText.style.display = "block";
 }
@@ -44,7 +37,8 @@ let currentFile = null;
 
 
 const tessaractMain = async (file) => {
-    await spinnerActive();
+
+    document.getElementById("loader").style.display = "block";
     
     const worker = await Tesseract.createWorker('eng');
     const ret = await worker.recognize(file);
@@ -52,15 +46,15 @@ const tessaractMain = async (file) => {
     console.log(data);
     uploadImageTextarea.innerHTML = data;
     await textActive()
-    
-    await spinnerInActive();
-
     await worker.terminate();
+
+    document.getElementById("loader").style.display = "none";
 }
 
 uploadImageInput.addEventListener("change", async (ie) => {
     // currentFile = uploadImageInput.files[0];
-    console.log(ie);
+    uploadImageTextarea.innerHTML = "";
+    await textInActive();
     const fr = new FileReader();
     fr.onload = async (fe) => {
         imageViewer.src = fe.target.result;

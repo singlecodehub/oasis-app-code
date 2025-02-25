@@ -4,6 +4,7 @@
 {% block title %}Home{% endblock %}
 
 {% block css %}
+<link rel="stylesheet" href="{% static '/home/audio_transcribe.css' %}">
 {% endblock %}
 
 
@@ -139,6 +140,25 @@
     
 </style>
 
+<div id="record-overlay-container" class="">
+    <div class="">
+        <div id="record-overlay">
+            <div class="record-overlay-top">
+                Recording
+            </div>
+            <div class="record-overlay-bottom">
+                <button id="stop-recording" class="stop-recording btn btn-danger">
+                    Stop recording
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="loader">
+    <div></div>
+</div>
 
 
 <h1>Welcome to OASIS Form Page</h1>
@@ -181,7 +201,12 @@
                     </div>
                     <div>
                         <label for="id_pat_demo">Patient Demographics:</label>
-                        <textarea id="id_pat_demo" name="pat_demo" rows="5" style="width:100%;">{{ form.pat_demo.value|default:'' }}</textarea>
+                        <div class="record-cotnainer">
+                            <div class="record-wrapper record-box">
+                                <button type="button" id="" class="record btn btn-sm btn-warning"><i class="bi bi-mic-fill"></i></button>
+                                <textarea class="record-text" id="id_pat_demo" name="pat_demo" rows="5" style="width:100%;">{{ form.pat_demo.value|default:'' }}</textarea>
+                            </div>
+                        </div>
                     </div>
         
         
@@ -1397,5 +1422,6 @@
 
 {% block js %}
 <!-- v5 -->
+<script src="{% static '/home/audio_transcribe.js' %}"></script>
 <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
 {% endblock %}

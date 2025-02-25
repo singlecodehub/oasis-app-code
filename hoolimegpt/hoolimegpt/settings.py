@@ -184,6 +184,7 @@ DEFAULT_FROM_EMAIL = 'reporting@pathwellhealth.com'
 # import os
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+TEMP_AUDIO = os.path.join(BASE_DIR, "media/audio")
 
 GS_BUCKET_NAME = config('GS_BUCKET_NAME')
 GS_CREDENTIALS_FILE = config('GS_CREDENTIALS_FILE')

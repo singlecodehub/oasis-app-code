@@ -4,7 +4,6 @@
 {% block title %}Home{% endblock %}
 
 {% block css %}
-    
 {% endblock %}
 
 
@@ -618,31 +617,79 @@
                           width: 100%;
                           hight: 100%;
                           display: flex;
-                          justify-content: center;
                         }
+                        .image-upload {
+                            justify-content: end;
+                        }
+
                         .image-viewer {
+                            padding: relative;
+                            justify-content: center;
                             width: 100%;
                             height: 300px;
                             background: white;
-
                         }
+                        
+                        .image-text-spinner {
+                            position: absolute;
+                            height: 300px;
+                            width: 100%;
+                            background-color: rgba(29, 29, 29, 0.3);
+                            display: none;
+                        }
+                        .image-text-spinner-inner {
+                            height: 100%;
+                            width: 100%;
+                            display: flex;
+                            flex-flow: column;
+                            justify-content: center;
+                            align-items: center;
+                        }
+
                         .image-viewer > img {
-                          max-width: 100%;
-                          height: 300px;
+                            max-width: 100%;
+                            height: 300px;
+                        }
+
+                        .upload-image-text {
+                            width: 100%;
+                            height: 300px;
+                        }
+                        .upload-image-text {
+                            display: none;
+                        }
+                        .upload-image-text > textarea {
+                            width: 100%;
+                            height: 100%;
+                            resize: none;
                         }
                       </style>
                     
                       <div>
                         <div class="image-upload-container">
-                          <div class="image-viewer">
-                            <img src="" alt="Upload image" />
-                          </div>
-                          <div class="image-upload mt-5">
-                            <input type="file" hidden id="upload-image-input">
-                            <button type="button" class="btn btn-lg btn-success" type="file" name="image-upload" id="image-upload-button">
-                                Upload
-                            </button>
-                          </div>
+                            <div class="image-upload">
+                                
+                                <input type="file" hidden id="upload-image-input">
+                                <button type="button" class="btn btn-sm btn-success m-2" type="file" name="image-upload" id="image-upload-button">
+                                    Upload
+                                </button>
+                                <button type="button" class="btn btn-sm btn-success m-2" type="file" name="image-upload" id="copy-upload-text">
+                                    Copy
+                                </button>
+                            </div>
+                            <div class="image-viewer mt-3">
+                                
+                                {% comment %} <div class="image-text-spinner">
+                                    <div class="image-text-spinner-inner">
+                                        <div class='p-3 bg-light rounded-3'>Extracting..</div>
+                                    </div>
+                                </div> {% endcomment %}
+
+                                <img src="" alt="Upload image" />
+                            </div>
+                            <div class="upload-image-text">
+                                <textarea name="" id=""  ></textarea>
+                            </div>
                         </div>
                       </div>
                       <script src="{% static 'home/upload_image.js' %}" defer></script>
@@ -1349,5 +1396,6 @@
 {% endblock %}
 
 {% block js %}
-
+<!-- v5 -->
+<script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
 {% endblock %}

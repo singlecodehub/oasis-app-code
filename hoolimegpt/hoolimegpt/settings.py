@@ -186,7 +186,8 @@ DEFAULT_FROM_EMAIL = 'reporting@pathwellhealth.com'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 GS_BUCKET_NAME = config('GS_BUCKET_NAME')
-GS_CREDENTIALS = service_account.Credentials.from_service_account_file(os.path.join(BASE_DIR, config('GS_CREDENTIALS_FILE')))
+GS_CREDENTIALS_FILE = config('GS_CREDENTIALS_FILE')
+GS_CREDENTIALS = service_account.Credentials.from_service_account_file(os.path.join(BASE_DIR, GS_CREDENTIALS_FILE))
 MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
 
 
@@ -198,3 +199,8 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
+
+# Speech to test
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GS_CREDENTIALS_FILE
+# print(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
